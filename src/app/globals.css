@@ -2091,3 +2091,24 @@ html, body {
     max-width: 100% !important;
   }
 }
+
+/* ============================================================
+   PERFORMANCE & IMAGE OPTIMIZATIONS
+   ============================================================ */
+
+/* Hardware accelerated transitions for 60fps-120fps fluid scrolling */
+.group\/card,
+.group\/car-card,
+.sbt-list-item,
+.sbt-list-item-card {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Improve browser image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  content-visibility: auto;
+}
+

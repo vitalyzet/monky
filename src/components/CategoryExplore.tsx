@@ -112,6 +112,8 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
                   <img
                     src={cat.image}
                     alt={cat.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/card:scale-115 group-hover/card:-translate-y-1 group-hover/card:rotate-[-2deg] group-hover/card:brightness-105"
                   />
                   <div className="card-sheen-sweep" />

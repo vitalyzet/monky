@@ -169,6 +169,8 @@ export const CarListingCard: React.FC<{
           <img
             src={images[currentIdx] || item.image || '/42.svg'}
             alt={item.title}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = '/42.svg';
@@ -557,6 +559,8 @@ export const ListingListCard: React.FC<ListingListCardProps> = ({
         <img
           src={images[currentIdx] || item.image || '/42.svg'}
           alt={item.title}
+          loading="lazy"
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-103"
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).src = '/42.svg';
