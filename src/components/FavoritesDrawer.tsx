@@ -105,8 +105,8 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ isOpen, onClos
       />
 
       {/* Slide-over Drawer Panel */}
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md sm:max-w-lg bg-white dark:bg-[#18191c] border-l border-slate-200 dark:border-[#282a30] shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out animate-in slide-in-from-right">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-full sm:max-w-md bg-white dark:bg-[#18191c] border-l border-slate-200 dark:border-[#282a30] shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out animate-in slide-in-from-right">
           
           {/* Drawer Header matching user screenshot */}
           <div className="px-5 py-4 border-b border-slate-200/80 dark:border-[#282a30] flex items-center justify-between bg-white/80 dark:bg-[#18191c]/80 backdrop-blur-md sticky top-0 z-10">

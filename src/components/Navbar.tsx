@@ -142,19 +142,24 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Brand Logo */}
         <Link
           href="/"
-          className="cursor-pointer select-none group"
+          className="cursor-pointer select-none group flex-shrink-0"
           onClick={() => {
             if (onResetSearch) onResetSearch();
           }}
           title="Tevinde.ro Home"
         >
-          <MonkyLogo height={46} />
+          <div className="block sm:hidden">
+            <MonkyLogo height={36} />
+          </div>
+          <div className="hidden sm:block">
+            <MonkyLogo height={44} />
+          </div>
         </Link>
 
         {/* Inline Compact Search Input inside Navbar when scrolled */}
         {isSearchVisible && (
           <div className="flex-1 max-w-md mx-2 sm:mx-4 relative flex items-center animate-in fade-in duration-300">
-            <Search className="absolute left-3.5 text-slate-400 flex-shrink-0" size={15} />
+            <Search className="absolute left-3 text-slate-400 flex-shrink-0" size={14} />
             <input
               type="text"
               value={searchQuery}
@@ -162,34 +167,34 @@ export const Navbar: React.FC<NavbarProps> = ({
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleSearchSubmit();
               }}
-              placeholder="Căutare în anunțuri..."
-              className="w-full pl-9 pr-8 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-[#161f28] border border-slate-200/90 dark:border-[#2d3b49] rounded-full text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors shadow-2xs"
+              placeholder="Căutare..."
+              className="w-full pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-[#161f28] border border-slate-200/90 dark:border-[#2d3b49] rounded-full text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#03c1a2] transition-colors shadow-2xs"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery?.('')}
-                className="absolute right-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                className="absolute right-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
               >
-                <X size={14} />
+                <X size={13} />
               </button>
             )}
           </div>
         )}
 
-        {/* Nav Actions (Identical Original Navbar Layout) */}
-        <div className="nav-actions flex items-center gap-2 sm:gap-3">
-          {/* Language Selector Pill matching user screenshot */}
+        {/* Nav Actions */}
+        <div className="nav-actions flex items-center gap-1.5 sm:gap-3">
+          {/* Language Selector Pill */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-300/80 dark:border-slate-700/80 bg-slate-100/80 dark:bg-[#1e2732] hover:bg-slate-200 dark:hover:bg-[#283443] text-slate-800 dark:text-slate-100 text-xs font-bold transition-all shadow-2xs"
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-300/80 dark:border-slate-700/80 bg-slate-100/80 dark:bg-[#1e2732] hover:bg-slate-200 dark:hover:bg-[#283443] text-slate-800 dark:text-slate-100 text-xs font-bold transition-all shadow-2xs"
               title="Schimbă Limba / Change Language"
             >
               <span className="text-sm leading-none">{lang === 'RO' ? '🇷🇴' : lang === 'EN' ? '🇬🇧' : '🇪🇸'}</span>
               <span className="font-extrabold tracking-wide text-xs">{lang}</span>
-              <ChevronDown size={14} className={`text-slate-400 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown size={13} className={`text-slate-400 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {langOpen && (
@@ -219,45 +224,51 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Theme Switcher Button - Hidden when compact search is visible */}
+          {/* Theme Switcher Button */}
           {!isSearchVisible && (
             <button
               onClick={toggleTheme}
-              className="nav-btn-text animate-in fade-in duration-200"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
               title={theme === 'dark' ? 'Comută pe modul Luminos' : 'Comută pe modul Întunecat'}
             >
               {theme === 'dark' ? (
                 <>
-                  <Sun size={20} className="text-amber-400" />
+                  <Sun size={18} className="text-amber-400" />
                   <span className="hidden md:inline text-xs text-amber-300 font-medium">Luminos</span>
                 </>
               ) : (
                 <>
-                  <Moon size={20} className="text-slate-600" />
+                  <Moon size={18} className="text-slate-600" />
                   <span className="hidden md:inline text-xs text-slate-600 font-medium">Întunecat</span>
                 </>
               )}
             </button>
           )}
 
-          {/* Search Button - Hidden when compact search is visible */}
+          {/* Search Button (Hidden when compact search is visible) */}
           {!isSearchVisible && (
             <button
-              className="nav-btn-text animate-in fade-in duration-200"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
               onClick={() => {
                 const el = document.getElementById('listings-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  router.push('/cautare');
+                }
               }}
+              title="Căutare"
             >
               <Search size={18} />
-              <span className="hidden sm:inline">Căutare</span>
+              <span className="hidden sm:inline text-xs font-semibold">Căutare</span>
             </button>
           )}
 
+          {/* Desktop-only: Salvate Button (Handled by BottomNav on mobile) */}
           <button
             type="button"
             onClick={() => setIsFavoritesOpen(true)}
-            className="nav-btn-text cursor-pointer relative"
+            className="nav-btn-text cursor-pointer relative hidden sm:flex items-center gap-1.5"
             title="Vezi anunțurile salvate"
           >
             <Heart size={18} className={favCount > 0 ? "fill-rose-500 text-rose-500" : ""} />
@@ -269,8 +280,9 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
+          {/* Desktop-only: User Account Menu (Handled by BottomNav on mobile) */}
           {currentUser ? (
-            <div className="relative group">
+            <div className="relative group hidden sm:block">
               <Link href="/contul-meu" className="nav-btn-text flex items-center gap-2">
                 {navUserAvatar ? (
                   <div className="w-6 h-6 rounded-full overflow-hidden border border-[#bbf0dc] dark:border-emerald-500/40 bg-slate-100 dark:bg-[#1a1a1a] flex-shrink-0 flex items-center justify-center">
@@ -322,13 +334,14 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
           ) : (
-            <Link href="/contul-meu" className="nav-btn-text">
+            <Link href="/contul-meu" className="nav-btn-text hidden sm:flex items-center gap-1.5">
               <User size={18} />
               <span>Contul meu</span>
             </Link>
           )}
 
-          <Link href="/adauga-anunt" className="nav-btn-primary">
+          {/* Desktop-only: Adaugă Anunț Button (Elevated center button in BottomNav on mobile) */}
+          <Link href="/adauga-anunt" className="nav-btn-primary hidden sm:inline-flex">
             <PlusCircle size={18} className="inline mr-1.5" />
             Adaugă Anunț
           </Link>

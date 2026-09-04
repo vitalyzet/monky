@@ -156,7 +156,7 @@ export const CarListingCard: React.FC<{
       <Link
         id={`ad-card-${item.id}`}
         href={getListingUrl(item)}
-        className="flex flex-col h-full w-full bg-white dark:bg-[#1a1a1a] rounded-[22px] border border-slate-200/80 dark:border-[#2a2a2a] shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden group cursor-pointer"
+        className="flex flex-col h-full w-full bg-white dark:bg-[#1a1a1a] rounded-2xl sm:rounded-[22px] border border-slate-200/80 dark:border-[#2a2a2a] shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden group cursor-pointer"
         onClick={() => {
           if (typeof window !== 'undefined') {
             sessionStorage.setItem('lastViewedAdId', item.id);
@@ -165,8 +165,8 @@ export const CarListingCard: React.FC<{
         }}
       >
         {/* Top Photo Frame */}
-        <div className="p-2 pb-0">
-          <div className="relative aspect-[4/3] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#181818] overflow-hidden rounded-[18px]">
+        <div className="p-1.5 sm:p-2 pb-0">
+          <div className="relative aspect-[4/3] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#181818] overflow-hidden rounded-xl sm:rounded-[18px]">
             <img
               src={images[currentIdx] || item.image || '/42.svg'}
               alt={item.title}
@@ -198,20 +198,20 @@ export const CarListingCard: React.FC<{
               </button>
             )}
 
-            {/* Floating Heart Button in dark circular blur (Top Right - like in the photo) */}
+            {/* Floating Heart Button in dark circular blur */}
             <button
               type="button"
-              className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer shadow-sm"
+              className="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 w-7 h-7 sm:w-8.5 sm:h-8.5 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer shadow-sm"
               onClick={(e) => onToggleFavorite(item.id, e)}
               title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
             >
               <Heart
-                size={16}
+                size={14}
                 className={isFav ? 'fill-red-500 text-red-500' : 'text-white'}
               />
             </button>
 
-            {/* Floating Year Badge for Cars (No shipping for cars) */}
+            {/* Floating Year Badge for Cars */}
             {(() => {
               const resolvedYear = item.year || (() => {
                 const match = (item.title || '').match(/\b(19\d\d|20[0-2]\d)\b/);
@@ -220,8 +220,8 @@ export const CarListingCard: React.FC<{
 
               if (resolvedYear) {
                 return (
-                  <div className="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[11.5px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none">
-                    <Calendar size={13} className="text-white" />
+                  <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] sm:text-[11.5px] font-extrabold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full flex items-center gap-1 shadow-sm pointer-events-none">
+                    <Calendar size={11} className="text-white" />
                     <span>{resolvedYear}</span>
                   </div>
                 );
@@ -229,8 +229,8 @@ export const CarListingCard: React.FC<{
 
               if (item.hasShipping) {
                 return (
-                  <div className="absolute bottom-2.5 left-2.5 bg-black/55 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none">
-                    <Truck size={13} className="text-white" />
+                  <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 bg-black/55 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full flex items-center gap-1 shadow-sm pointer-events-none">
+                    <Truck size={11} className="text-white" />
                     <span>Livrare</span>
                   </div>
                 );
@@ -242,43 +242,43 @@ export const CarListingCard: React.FC<{
         </div>
 
         {/* Card Content Body */}
-        <div className="p-3.5 pt-2.5 flex flex-col justify-between flex-grow">
+        <div className="p-2.5 sm:p-3.5 pt-2 sm:pt-2.5 flex flex-col justify-between flex-grow">
           <div>
-            {/* Price (Normal clean font) */}
-            <div className="text-[16px] font-bold text-slate-900 dark:text-white mb-0.5">
+            {/* Price */}
+            <div className="text-sm sm:text-base md:text-[17px] font-black text-slate-900 dark:text-white mb-0.5 tracking-tight truncate">
               {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
                 ? `${Number(item.price).toLocaleString('ro-RO')} ${String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? 'Lei' : item.currency || '€'}`
                 : 'Preț la cerere'}
             </div>
 
-            {/* Title (Clean font-medium) */}
-            <h3 className="text-[14px] font-semibold text-slate-800 dark:text-slate-100 leading-snug line-clamp-1 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" title={item.title}>
+            {/* Title */}
+            <h3 className="text-xs sm:text-[14px] font-semibold text-slate-800 dark:text-slate-100 leading-snug line-clamp-1 mb-1 group-hover:text-[#03c1a2] transition-colors" title={item.title}>
               {item.title}
             </h3>
 
-            {/* Location & Distance with Navigation arrow (like in photo) */}
-            <div className="flex items-center gap-1.5 text-[12px] text-slate-400 dark:text-slate-400 font-normal">
-              <Navigation size={12} className="rotate-45 text-slate-400 flex-shrink-0" />
-              <span className="truncate">{item.location || 'România'} {distanceKm !== null ? `· ${formatDistanceKm(distanceKm)}` : '· 1.5 km'}</span>
+            {/* Location & Distance */}
+            <div className="flex items-center gap-1 text-[11px] sm:text-[12px] text-slate-400 dark:text-slate-400 font-normal truncate">
+              <Navigation size={11} className="rotate-45 text-slate-400 flex-shrink-0" />
+              <span className="truncate">{item.location || 'România'} {distanceKm !== null ? `· ${formatDistanceKm(distanceKm)}` : ''}</span>
             </div>
           </div>
 
           {/* User / Seller Row */}
-          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+          <div className="mt-2 pt-1.5 sm:mt-2.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-1 sm:gap-2">
             <div className="flex items-center gap-1.5 min-w-0">
               <img
                 src={sellerAvatar}
                 alt=""
-                className="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-2xs"
+                className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-2xs"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = getDistinctSellerAvatar(item.seller?.name, (item as any).userId);
                 }}
               />
-              <span className="text-[11px] text-slate-600 dark:text-slate-300 truncate font-medium">
+              <span className="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 truncate font-medium">
                 {formatPublicName(item.seller?.name || 'Vânzător')}
               </span>
             </div>
-            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+            <span className="text-[9.5px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
               {formatTimeAgo(item.createdAt)}
             </span>
           </div>
@@ -805,8 +805,8 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
           ))}
         </div>
       ) : (
-        /* Modern Grid View */
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-2.5 mb-10">
+        /* Modern Grid View (2-column on mobile, 3-4 on desktop) */
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-2.5 mb-10">
           {listings.map((item) => (
             <CarListingCard
               key={item.id}

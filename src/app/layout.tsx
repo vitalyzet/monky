@@ -1,7 +1,8 @@
 import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { AuthProvider } from '@/lib/AuthContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
+import { BottomNav } from '@/components/BottomNav';
 import { Nunito } from 'next/font/google';
 
 const nunito = Nunito({ 
@@ -9,6 +10,17 @@ const nunito = Nunito({
   display: 'swap',
   variable: '--font-nunito',
 });
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#131417' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://tevinde.ro'),
@@ -140,6 +152,7 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider>
             {children}
+            <BottomNav />
           </ThemeProvider>
         </AuthProvider>
       </body>

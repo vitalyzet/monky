@@ -651,7 +651,7 @@ function SearchContent() {
 
 
         {/* Container for Results */}
-        <section className="w-full bg-[#F2F3F6] dark:bg-[#1a222d] rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/80 dark:border-[#2d3b49] shadow-xs my-6">
+        <section className="w-full bg-[#F2F3F6] dark:bg-[#1a222d] rounded-2xl sm:rounded-3xl p-2.5 sm:p-7 border border-slate-200/80 dark:border-[#2d3b49] shadow-xs my-4 sm:my-6">
           {/* Results Header Control Row */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
             <div>
@@ -794,8 +794,8 @@ function SearchContent() {
               ))}
             </div>
           ) : (
-            /* GRID VIEW (Modern Card Layout that follows global theme) */
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-3">
+            /* GRID VIEW (Modern Card Layout that follows global theme) - 2 columns on mobile */
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-3">
               {sortedListings.slice(0, visibleCount).map((item) => (
                 <CarListingCard
                   key={item.id || Math.random().toString()}

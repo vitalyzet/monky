@@ -129,7 +129,7 @@ export const SearchFilterBox: React.FC<SearchFilterBoxProps> = ({
       {/* Sleek, Minimalist, Professional Search Bar */}
       <form
         onSubmit={handleSearchSubmit}
-        className="w-full bg-white dark:bg-[#1a232f] border border-slate-200 dark:border-[#2d3a4b] rounded-lg shadow-sm flex flex-col sm:flex-row items-stretch overflow-visible transition-all focus-within:border-slate-400 dark:focus-within:border-slate-500 focus-within:shadow-md relative"
+        className="w-full bg-white dark:bg-[#1a232f] border border-slate-200 dark:border-[#2d3a4b] rounded-2xl sm:rounded-xl shadow-xs flex flex-col sm:flex-row items-stretch overflow-hidden transition-all focus-within:border-[#03c1a2] dark:focus-within:border-[#03c1a2] focus-within:shadow-md relative"
       >
         {/* Field 1: Ce anume cauți? */}
         <div
@@ -220,7 +220,7 @@ export const SearchFilterBox: React.FC<SearchFilterBoxProps> = ({
         <button
           type="submit"
           disabled={isSearching}
-          className="bg-[#002f34] hover:bg-[#002226] disabled:bg-[#002f34]/85 dark:bg-[#03c1a2] dark:hover:bg-[#02a88d] dark:disabled:bg-[#03c1a2]/80 text-white font-bold px-7 sm:px-9 py-3 sm:py-3.5 flex items-center justify-center gap-2.5 transition-colors cursor-pointer disabled:cursor-wait flex-shrink-0 text-sm sm:text-base select-none"
+          className="bg-[#002f34] hover:bg-[#002226] disabled:bg-[#002f34]/85 dark:bg-[#03c1a2] dark:hover:bg-[#02a88d] dark:disabled:bg-[#03c1a2]/80 text-white font-bold px-7 sm:px-9 py-3 sm:py-3.5 flex items-center justify-center gap-2.5 transition-colors cursor-pointer disabled:cursor-wait flex-shrink-0 text-sm sm:text-base select-none w-full sm:w-auto active:scale-[0.99]"
         >
           <span>Căutare</span>
           {isSearching ? (

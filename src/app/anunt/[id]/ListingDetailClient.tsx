@@ -294,7 +294,7 @@ export default function ListingDetailClient({
     <div className="min-h-screen flex flex-col bg-[#f6f6f6] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <Navbar favoriteCount={isFavorite ? 1 : 0} />
 
-      <main className="main-container flex-grow max-w-[1200px] mx-auto px-4 py-4">
+      <main className="main-container flex-grow max-w-[1200px] mx-auto px-3 sm:px-4 py-3 sm:py-4 pb-28 sm:pb-8">
         {/* Navigation & Breadcrumb Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-3 mb-3 text-sm">
           {/* Left: Back Arrow + Breadcrumb */}
@@ -326,14 +326,14 @@ export default function ListingDetailClient({
                 {listing.category === 'auto-acc' ? 'Auto, moto și ambarcațiuni' : (listing.category || 'Anunțuri')}
               </Link>
               <span className="text-slate-300 dark:text-slate-600">/</span>
-              <span className="text-slate-400 dark:text-slate-400 truncate max-w-[200px] sm:max-w-[350px]">
+              <span className="text-slate-400 dark:text-slate-400 truncate max-w-[140px] sm:max-w-[350px]">
                 {listing.title}
               </span>
             </nav>
           </div>
 
           {/* Right: Distribuie & Salvează buttons */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
             <button
               onClick={() => {
                 if (navigator.clipboard) {
@@ -341,18 +341,18 @@ export default function ListingDetailClient({
                   alert('Link-ul a fost copiat în clipboard!');
                 }
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#2a2a2a] border border-slate-200 dark:border-[#3a3a3a] hover:bg-slate-50 dark:hover:bg-[#333333] rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white dark:bg-[#2a2a2a] border border-slate-200 dark:border-[#3a3a3a] hover:bg-slate-50 dark:hover:bg-[#333333] rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all"
             >
-              <Share2 size={16} className="text-slate-500 dark:text-slate-400" />
-              <span>Distribuie</span>
+              <Share2 size={15} className="text-slate-500 dark:text-slate-400" />
+              <span className="hidden xs:inline">Distribuie</span>
             </button>
 
             <button
               onClick={() => setIsFavorite(!isFavorite)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#2a2a2a] border border-slate-200 dark:border-[#3a3a3a] hover:bg-slate-50 dark:hover:bg-[#333333] rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 bg-white dark:bg-[#2a2a2a] border border-slate-200 dark:border-[#3a3a3a] hover:bg-slate-50 dark:hover:bg-[#333333] rounded-xl text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-sm transition-all"
             >
               <Heart
-                size={16}
+                size={15}
                 fill={isFavorite ? '#ef4444' : 'none'}
                 color={isFavorite ? '#ef4444' : '#64748b'}
               />
@@ -387,9 +387,9 @@ export default function ListingDetailClient({
         )}
 
         {/* 2-Column Detail Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
           {/* Main Card (Left 2 Columns) */}
-          <div className="lg:col-span-2 bg-white dark:bg-[#262626] rounded-3xl p-6 border border-slate-200 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-6 transition-colors">
+          <div className="lg:col-span-2 bg-white dark:bg-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-5 sm:gap-6 transition-colors">
             
             {/* Title, Price & Header Info */}
             <div className="flex flex-col gap-2">
@@ -712,8 +712,8 @@ export default function ListingDetailClient({
           {/* Sidebar Cards (Right Column) */}
           <div className="flex flex-col gap-5 sticky top-24 h-fit">
             
-            {/* Card 1: Clean Seller Profile Card matching requested design */}
-            <div className="bg-white dark:bg-[#262626] rounded-3xl p-6 border border-slate-200/80 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-4 transition-all">
+            {/* Card 1: Clean Seller Profile Card */}
+            <div className="bg-white dark:bg-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200/80 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-4 transition-all">
               {/* Top Row: Telefon validat & Heart button */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold text-xs">
@@ -734,13 +734,13 @@ export default function ListingDetailClient({
                 </button>
               </div>
 
-              {/* Centered Avatar, Name & Vezi toate anunțurile */}
-              <div className="flex flex-col items-center text-center my-1">
+              {/* Seller Avatar and Info */}
+              <div className="flex flex-col items-center text-center pt-2">
                 <Link
                   href={`/utilizator/${encodeURIComponent(resolvedSellerName)}`}
                   className="relative group block"
                 >
-                  <div className="w-24 h-24 rounded-full overflow-hidden shadow-md group-hover:scale-105 transition-transform border-[3px] border-white dark:border-[#333333] ring-2 ring-slate-100 dark:ring-slate-700 bg-slate-100 dark:bg-[#181818]">
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-md group-hover:scale-105 transition-transform border-[3px] border-white dark:border-[#333333] ring-2 ring-slate-100 dark:ring-slate-700 bg-slate-100 dark:bg-[#181818]">
                     <img
                       src={resolvedSellerAvatar}
                       alt={resolvedSellerName}
@@ -772,7 +772,7 @@ export default function ListingDetailClient({
               <div className="flex items-center gap-2 pt-1">
                 <button
                   onClick={() => setShowPhone(!showPhone)}
-                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-600/20 text-sm sm:text-base whitespace-nowrap"
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-emerald-600/20 text-sm sm:text-base whitespace-nowrap"
                 >
                   <Phone size={18} className="fill-white flex-shrink-0" />
                   <span className="whitespace-nowrap">{showPhone ? (listing.seller?.phone || '0742 891 304') : 'Arată telefon'}</span>
@@ -780,7 +780,7 @@ export default function ListingDetailClient({
 
                 <button
                   onClick={handleToggleFollow}
-                  className={`p-3.5 rounded-2xl font-bold transition-all flex-shrink-0 flex items-center justify-center ${
+                  className={`p-3 rounded-2xl font-bold transition-all flex-shrink-0 flex items-center justify-center ${
                     isFollowing
                       ? 'bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-sky-400 border border-blue-200 dark:border-blue-800'
                       : 'bg-slate-100 hover:bg-slate-200 dark:bg-[#333] dark:hover:bg-[#444] text-slate-800 dark:text-white border border-slate-200/60 dark:border-[#444]'
@@ -798,8 +798,8 @@ export default function ListingDetailClient({
             </div>
 
             {/* Card 2: Contact Form Card */}
-            <div className="bg-white dark:bg-[#262626] rounded-3xl p-6 border border-slate-200 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-4 transition-colors">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Contactează vânzătorul</h3>
+            <div className="bg-white dark:bg-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-4 transition-colors">
+              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-4">Contactează vânzătorul</h3>
 
               <div className="flex flex-col gap-2">
                 <textarea
@@ -808,7 +808,7 @@ export default function ListingDetailClient({
                   disabled={isSendingMessage || isMessageSent}
                   rows={3}
                   maxLength={3000}
-                  className={`w-full border border-slate-200 dark:border-[#444444] rounded-2xl p-4 text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#383838] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 resize-none transition-all placeholder-slate-400 ${
+                  className={`w-full border border-slate-200 dark:border-[#444444] rounded-2xl p-3.5 sm:p-4 text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#383838] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 resize-none transition-all placeholder-slate-400 ${
                     isMessageSent ? 'opacity-60 cursor-not-allowed bg-slate-100 dark:bg-[#2e2e2e]' : 'focus:bg-white dark:focus:bg-[#3d3d3d]'
                   }`}
                   placeholder="Scrie mesajul tău..."
@@ -829,21 +829,23 @@ export default function ListingDetailClient({
                 disabled={isSendingMessage || isMessageSent || !messageText.trim()}
                 className={`w-full font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg mt-1 text-base ${
                   isMessageSent
-                    ? 'bg-emerald-600 text-white cursor-default shadow-emerald-600/20'
+                    ? 'bg-emerald-600 text-white cursor-default'
                     : isSendingMessage
-                    ? 'bg-blue-600/80 text-white cursor-wait opacity-90'
-                    : 'bg-blue-600 dark:bg-[#60a5fa] hover:bg-blue-700 dark:hover:bg-[#4b93ea] text-white dark:text-slate-950 hover:shadow-blue-500/25 active:scale-[0.99]'
+                    ? 'bg-blue-600 text-white opacity-80 cursor-wait'
+                    : !messageText.trim()
+                    ? 'bg-slate-200 dark:bg-[#383838] text-slate-400 cursor-not-allowed shadow-none'
+                    : 'bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white shadow-blue-500/25'
                 }`}
               >
-                {isSendingMessage ? (
+                {isMessageSent ? (
                   <>
-                    <Loader2 size={20} className="animate-spin" />
-                    <span>Se trimite...</span>
+                    <CheckCircle2 size={18} />
+                    <span>Mesaj trimis cu succes!</span>
                   </>
-                ) : isMessageSent ? (
+                ) : isSendingMessage ? (
                   <>
-                    <CheckCircle2 size={20} className="stroke-[2.5]" />
-                    <span>Mesaj trimis</span>
+                    <Loader2 size={18} className="animate-spin" />
+                    <span>Se trimite...</span>
                   </>
                 ) : (
                   <>
@@ -901,6 +903,54 @@ export default function ListingDetailClient({
           </div>
         )}
       </main>
+
+      {/* Mobile Sticky Contact Action Bar */}
+      <div 
+        className="fixed bottom-0 left-0 right-0 z-40 sm:hidden bg-white/95 dark:bg-[#15161a]/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-[#282a30] p-3 shadow-[0_-4px_24px_rgba(0,0,0,0.18)]"
+        style={{
+          paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+        }}
+      >
+        <div className="flex items-center gap-2 max-w-lg mx-auto">
+          {/* Favorite Button */}
+          <button
+            type="button"
+            onClick={() => setIsFavorite(!isFavorite)}
+            className="w-11 h-11 rounded-2xl border border-slate-200 dark:border-[#383838] bg-slate-50 dark:bg-[#252525] flex items-center justify-center text-slate-700 dark:text-slate-200 active:scale-90 transition-transform flex-shrink-0"
+            title={isFavorite ? 'Elimină din favorite' : 'Salvează la favorite'}
+          >
+            <Heart
+              size={20}
+              className={isFavorite ? 'fill-red-500 text-red-500' : 'text-slate-600 dark:text-slate-300'}
+            />
+          </button>
+
+          {/* Call Seller Button */}
+          <a
+            href={listing.seller?.phone ? `tel:${listing.seller.phone.replace(/\s+/g, '')}` : 'tel:0742891304'}
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold h-11 px-3 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md shadow-emerald-600/25 transition-all whitespace-nowrap"
+          >
+            <Phone size={16} className="fill-white flex-shrink-0" />
+            <span>Sună</span>
+          </a>
+
+          {/* Send Message Button (Smooth scrolls to message box) */}
+          <button
+            type="button"
+            onClick={() => {
+              const el = document.querySelector('textarea');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                el.focus();
+              }
+            }}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold h-11 px-3 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md shadow-blue-600/25 transition-all whitespace-nowrap"
+          >
+            <MessageCircle size={16} className="flex-shrink-0" />
+            <span>Mesaj</span>
+          </button>
+        </div>
+      </div>
 
       <Footer />
 
