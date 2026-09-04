@@ -96,28 +96,47 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [realListings, setRealListings] = useState<AdListing[]>(() => {
+  const [realListings, setRealListings] = useState<AdListing[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load favorites, active tab & real listings from memory/sessionStorage + Firestore on mount
+  useEffect(() => {
+    // 1. Immediately hydrate from memory/sessionStorage without waiting for network
     if (typeof window !== 'undefined') {
       if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
-        return (window as any).__MONKY_ALL_LISTINGS;
+        setRealListings((window as any).__MONKY_ALL_LISTINGS);
+        setLoading(false);
+      } else {
+        try {
+          const cached = sessionStorage.getItem('monky_cached_listings');
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (parsed && parsed.length > 0) {
+              setRealListings(parsed);
+              setLoading(false);
+            }
+          }
+        } catch (e) {}
       }
+
+      // 2. Restore saved home search & filter state
       try {
-        const saved = sessionStorage.getItem('monky_cached_listings');
-        if (saved) return JSON.parse(saved);
+        const savedSearch = sessionStorage.getItem('monky_home_search_state');
+        if (savedSearch) {
+          const parsed = JSON.parse(savedSearch);
+          if (parsed) {
+            if (parsed.searchQuery !== undefined) setSearchQuery(parsed.searchQuery);
+            if (parsed.activeTab) setActiveTab(parsed.activeTab);
+            if (parsed.selectedType) setSelectedType(parsed.selectedType);
+            if (parsed.selectedBrand) setSelectedBrand(parsed.selectedBrand);
+            if (parsed.selectedModel) setSelectedModel(parsed.selectedModel);
+            if (parsed.locationInput !== undefined) setLocationInput(parsed.locationInput);
+            if (parsed.selectedPrice) setSelectedPrice(parsed.selectedPrice);
+            if (parsed.selectedCategory !== undefined) setSelectedCategory(parsed.selectedCategory);
+          }
+        }
       } catch (e) {}
     }
-    return [];
-  });
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) return false;
-      if (sessionStorage.getItem('monky_cached_listings')) return false;
-    }
-    return true;
-  });
-
-  // Load favorites, active tab & real listings from Firestore + localStorage + sessionStorage on mount
-  useEffect(() => {
     try {
       const savedFavs = localStorage.getItem('monky_favorites');
       if (savedFavs) {
@@ -336,7 +355,27 @@ export default function HomePage() {
     setLocationInput('');
     setSelectedPrice('Orice');
     setSelectedCategory(null);
+    try {
+      sessionStorage.removeItem('monky_home_search_state');
+    } catch (e) {}
   };
+
+  // Persist home search and filter state to sessionStorage
+  useEffect(() => {
+    try {
+      const searchState = {
+        searchQuery,
+        activeTab,
+        selectedType,
+        selectedBrand,
+        selectedModel,
+        locationInput,
+        selectedPrice,
+        selectedCategory,
+      };
+      sessionStorage.setItem('monky_home_search_state', JSON.stringify(searchState));
+    } catch (e) {}
+  }, [searchQuery, activeTab, selectedType, selectedBrand, selectedModel, locationInput, selectedPrice, selectedCategory]);
 
   const hasActiveFilters = Boolean(
     searchQuery.trim() ||
@@ -564,9 +603,9 @@ export default function HomePage() {
         )}
 
         {/* Listings Section */}
-        <section className="w-full my-6">
-          {loading ? (
-            <div className="flex justify-center items-center py-24">
+        <section className="w-full my-6 min-h-[600px]">
+          {loading && realListings.length === 0 ? (
+            <div className="flex justify-center items-center py-24 min-h-[400px]">
               <p className="text-slate-500 font-semibold animate-pulse">Se încarcă anunțurile...</p>
             </div>
           ) : (

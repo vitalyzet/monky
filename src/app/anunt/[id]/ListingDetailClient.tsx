@@ -340,13 +340,16 @@ export default function ListingDetailClient({
             <button
               type="button"
               onClick={() => {
-                if (window.history.length > 1) {
+                const returnUrl = typeof window !== 'undefined' ? sessionStorage.getItem('monky_last_search_url') : null;
+                if (returnUrl) {
+                  router.push(returnUrl);
+                } else if (window.history.length > 1) {
                   router.back();
                 } else {
                   router.push('/');
                 }
               }}
-              className="w-9 h-9 rounded-full bg-white dark:bg-[#2a2a2a] border border-slate-200 dark:border-[#3a3a3a] shadow-sm flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#333333] hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0"
+              className="w-9 h-9 rounded-full bg-white dark:bg-[#2a2a2a] border border-slate-200 dark:border-[#3a3a3a] shadow-sm flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#333333] hover:text-slate-900 dark:hover:text-white transition-colors flex-shrink-0 cursor-pointer"
               title="Înapoi la lista de anunțuri"
             >
               <ChevronLeft size={20} />

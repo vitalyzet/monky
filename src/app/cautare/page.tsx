@@ -129,38 +129,39 @@ function SearchContent() {
   const [sortBy, setSortBy] = useState<'distance' | 'newest' | 'price_asc' | 'price_desc'>('distance');
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [realListings, setRealListings] = useState<AdListing[]>(() => {
-    if (typeof window !== 'undefined') {
-      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
-        return (window as any).__MONKY_ALL_LISTINGS;
-      }
-      try {
-        const saved = sessionStorage.getItem('monky_cached_listings');
-        if (saved) return JSON.parse(saved);
-      } catch (e) {}
-    }
-    return [];
-  });
-  const [loading, setLoading] = useState(() => {
-    if (typeof window !== 'undefined') {
-      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) return false;
-      if (sessionStorage.getItem('monky_cached_listings')) return false;
-    }
-    return true;
-  });
+  const [realListings, setRealListings] = useState<AdListing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isLocating, setIsLocating] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
-  const [visibleCount, setVisibleCount] = useState(() => {
+  const [visibleCount, setVisibleCount] = useState(12);
+
+  // Hydrate cached listings immediately on client mount without hydration mismatch
+  useEffect(() => {
     if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('monky_visible_count');
-      if (saved) {
-        const parsed = parseInt(saved, 10);
-        if (!isNaN(parsed) && parsed >= 12) return parsed;
+      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+        setRealListings((window as any).__MONKY_ALL_LISTINGS);
+        setLoading(false);
+      } else {
+        try {
+          const saved = sessionStorage.getItem('monky_cached_listings');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.length > 0) {
+              setRealListings(parsed);
+              setLoading(false);
+            }
+          }
+        } catch (e) {}
+      }
+
+      const savedCount = sessionStorage.getItem('monky_visible_count');
+      if (savedCount) {
+        const parsed = parseInt(savedCount, 10);
+        if (!isNaN(parsed) && parsed >= 12) setVisibleCount(parsed);
       }
     }
-    return 12;
-  });
+  }, []);
 
   // Seamless scroll restoration when returning from details page
   useEffect(() => {
@@ -1105,7 +1106,7 @@ function SearchContent() {
         )}
 
         {/* Container for Results */}
-        <section className="w-full bg-[#F2F3F6] dark:bg-[#1a222d] rounded-2xl sm:rounded-3xl p-3 sm:p-7 border border-slate-200/80 dark:border-[#2d3b49] shadow-xs my-2 sm:my-4">
+        <section className="w-full min-h-[600px] bg-[#F2F3F6] dark:bg-[#1a222d] rounded-2xl sm:rounded-3xl p-3 sm:p-7 border border-slate-200/80 dark:border-[#2d3b49] shadow-xs my-2 sm:my-4">
           {/* Results Header Info Row */}
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>
@@ -1142,8 +1143,8 @@ function SearchContent() {
           </div>
 
           {/* Results Listings */}
-          {loading ? (
-            <div className="flex justify-center items-center py-24">
+          {loading && realListings.length === 0 ? (
+            <div className="flex justify-center items-center py-24 min-h-[300px]">
               <Loader2 className="animate-spin text-[#03c1a2] mr-2" size={24} />
               <p className="text-slate-500 font-semibold">Se încarcă anunțurile...</p>
             </div>

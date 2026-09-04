@@ -46,6 +46,7 @@ export function recordCardClick(item: any) {
   try {
     sessionStorage.setItem('monky_scroll_pos', window.scrollY.toString());
     sessionStorage.setItem('lastViewedAdId', item.id);
+    sessionStorage.setItem('monky_last_search_url', window.location.pathname + window.location.search);
   } catch (e) {}
 }
 
