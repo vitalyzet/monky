@@ -11,12 +11,12 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: '#03c1a2',
     icons: [
       {
-        src: '/6ba82cfe-a73d-4741-9f6b-3916424ba990.png',
+        src: '/tevinde-logo-thumb.png',
         sizes: '192x192',
         type: 'image/png',
       },
       {
-        src: '/6ba82cfe-a73d-4741-9f6b-3916424ba990.png',
+        src: '/tevinde-logo-thumb.png',
         sizes: '512x512',
         type: 'image/png',
       },
