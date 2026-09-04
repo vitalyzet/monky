@@ -102,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isSearchVisible = showCompactSearch || scrolled;
+  const isSearchVisible = Boolean(showCompactSearch);
 
   React.useEffect(() => {
     if (favoriteCount !== undefined && favoriteCount > 0) {
@@ -224,26 +224,24 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          {/* Theme Switcher Button */}
-          {!isSearchVisible && (
-            <button
-              onClick={toggleTheme}
-              className="p-2 sm:px-2.5 md:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
-              title={theme === 'dark' ? 'Comută pe modul Luminos' : 'Comută pe modul Întunecat'}
-            >
-              {theme === 'dark' ? (
-                <>
-                  <Sun size={18} className="text-amber-400" />
-                  <span className="hidden lg:inline text-xs text-amber-300 font-medium">Luminos</span>
-                </>
-              ) : (
-                <>
-                  <Moon size={18} className="text-slate-600" />
-                  <span className="hidden lg:inline text-xs text-slate-600 font-medium">Întunecat</span>
-                </>
-              )}
-            </button>
-          )}
+          {/* Theme Switcher Button - Always accessible */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 sm:px-2.5 md:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
+            title={theme === 'dark' ? 'Comută pe modul Luminos' : 'Comută pe modul Întunecat'}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun size={18} className="text-amber-400" />
+                <span className="hidden lg:inline text-xs text-amber-300 font-medium">Luminos</span>
+              </>
+            ) : (
+              <>
+                <Moon size={18} className="text-slate-600" />
+                <span className="hidden lg:inline text-xs text-slate-600 font-medium">Întunecat</span>
+              </>
+            )}
+          </button>
 
           {/* Search Button (Hidden when compact search is visible) */}
           {!isSearchVisible && (

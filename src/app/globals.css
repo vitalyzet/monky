@@ -2056,8 +2056,8 @@ a.group:hover h3,
 }
 
 html, body {
-  overflow-x: hidden !important;
-  max-width: 100vw !important;
+  overflow-x: clip !important;
+  max-width: 100vw;
 }
 
 /* ---- MOBILE: screens below 640px ---- */
