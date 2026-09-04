@@ -1,10 +1,14 @@
-import React from 'react';
+import React, { cache } from 'react';
 import { Metadata } from 'next';
 import { getListingById } from '@/lib/db';
 import ListingDetailClient from './ListingDetailClient';
 
+const getCachedListing = cache(async (id: string) => {
+  return getListingById(id);
+});
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const listing = await getListingById(params.id);
+  const listing = await getCachedListing(params.id);
   if (!listing) {
     return {
       title: 'Anunț negăsit | Tevinde.ro',
@@ -50,7 +54,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 }
 
 export default async function ListingDetailPage({ params }: { params: { id: string } }) {
-  const listing = await getListingById(params.id);
+  const listing = await getCachedListing(params.id);
 
   // Generate Product / Vehicle Rich Snippet for Google Search
   let jsonLdProduct: any = null;

@@ -13,6 +13,7 @@ import { Footer } from '@/components/Footer';
 import { Listing, CATEGORIES } from '@/data/mockData';
 import { getListings, AdListing } from '@/lib/db';
 import { normalizeText } from '@/lib/stringUtils';
+import { prewarmAllListings } from '@/lib/adCache';
 
 const TYPE_TO_CAT_MAP: Record<string, string> = {
   'Tehnologie și electronică': 'tehnologie-electronica',
@@ -167,6 +168,7 @@ export default function HomePage() {
             combined.unshift(ad);
           }
         });
+        prewarmAllListings(combined);
         setRealListings(combined);
       } catch (err) {
         console.error('Eroare la încărcarea anunțurilor:', err);

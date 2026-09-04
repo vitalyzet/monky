@@ -10,8 +10,9 @@ import { ListingGrid } from '@/components/ListingGrid';
 import { Listing } from '@/data/mockData';
 import { AdListing, getListings, getAllUsersFromDb } from '@/lib/db';
 import { formatTimeAgo, formatExactDate } from '@/lib/timeUtils';
-import { getShortId } from '@/lib/slugUtils';
+import { getShortId, extractListingId } from '@/lib/slugUtils';
 import { getDistinctSellerAvatar } from '@/lib/avatarUtils';
+import { getCachedListing } from '@/lib/adCache';
 import {
   ArrowLeft,
   Heart,
@@ -49,15 +50,34 @@ export default function ListingDetailClient({
 }) {
   const router = useRouter();
   const { currentUser, isAdmin } = useAuth();
-  const [listing, setListing] = useState<AdListing | null>(initialListing);
+  const [listing, setListing] = useState<AdListing | null>(() => {
+    if (initialListing) return initialListing;
+    return getCachedListing(targetId);
+  });
+  const [hasChecked, setHasChecked] = useState(false);
   const [recommendedListings, setRecommendedListings] = useState<AdListing[]>([]);
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
-  const [resolvedSellerAvatar, setResolvedSellerAvatar] = useState<string>('/images/avatar/an32.png');
-  const [resolvedSellerName, setResolvedSellerName] = useState<string>(listing?.seller?.name || 'Vânzător');
+
+  const initialCandidate = initialListing || (typeof window !== 'undefined' ? getCachedListing(targetId) : null);
+  const [resolvedSellerAvatar, setResolvedSellerAvatar] = useState<string>(() => {
+    return (
+      (initialCandidate?.seller as any)?.avatar ||
+      (initialCandidate?.seller as any)?.avatarUrl ||
+      getDistinctSellerAvatar(initialCandidate?.seller?.name, initialCandidate?.userId)
+    );
+  });
+  const [resolvedSellerName, setResolvedSellerName] = useState<string>(() => {
+    return initialCandidate?.seller?.name || 'Vânzător';
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(() => setHasChecked(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     async function syncAvatarAndName() {
@@ -175,21 +195,38 @@ export default function ListingDetailClient({
     }
   };
 
-  // Fallback to load from localStorage if initialListing is missing
+  // Sync listing from initialListing or cache/db if missing
   useEffect(() => {
-    if (!listing && targetId) {
+    if (initialListing) {
+      setListing(initialListing);
+    } else if (!listing && targetId) {
+      const cached = getCachedListing(targetId);
+      if (cached) {
+        setListing(cached);
+        return;
+      }
       try {
         const saved = localStorage.getItem('monky_user_listings');
         if (saved) {
           const parsed: AdListing[] = JSON.parse(saved);
-          const found = parsed.find((item) => item.id === targetId);
-          if (found) setListing(found);
+          const found = parsed.find((item) => item.id === targetId || targetId.endsWith(item.id));
+          if (found) {
+            setListing(found);
+            return;
+          }
         }
       } catch (e) {
         console.error(e);
       }
+
+      // Fallback async fetch
+      import('@/lib/db').then(({ getListingById }) => {
+        getListingById(targetId).then((found) => {
+          if (found) setListing(found);
+        });
+      });
     }
-  }, [listing, targetId]);
+  }, [initialListing, targetId]);
 
   // Fetch recommendations
   useEffect(() => {
@@ -239,6 +276,19 @@ export default function ListingDetailClient({
   }, [listing]);
 
   if (!listing) {
+    if (!hasChecked) {
+      return (
+        <div className="min-h-screen flex flex-col bg-[#f8fafc] dark:bg-[#121212] text-slate-900 dark:text-slate-100">
+          <Navbar favoriteCount={favorites.length} />
+          <main className="max-w-[1240px] w-full mx-auto px-4 py-16 flex flex-col items-center justify-center flex-grow">
+            <Loader2 className="w-8 h-8 animate-spin text-[#03c1a2] mb-3" />
+            <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Se încarcă detaliile anunțului...</p>
+          </main>
+          <Footer />
+        </div>
+      );
+    }
+
     return (
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#181818] text-slate-900 dark:text-slate-100">
         <Navbar favoriteCount={0} />
@@ -264,13 +314,6 @@ export default function ListingDetailClient({
     e.stopPropagation();
     setActiveImageIdx((prev) => {
       const nextIdx = prev === 0 ? galleryImages.length - 1 : prev - 1;
-      setTimeout(() => {
-        document.getElementById(`thumb-${nextIdx}`)?.scrollIntoView({
-          behavior: 'smooth',
-          inline: 'center',
-          block: 'nearest',
-        });
-      }, 50);
       return nextIdx;
     });
   };
@@ -279,16 +322,11 @@ export default function ListingDetailClient({
     e.stopPropagation();
     setActiveImageIdx((prev) => {
       const nextIdx = prev === galleryImages.length - 1 ? 0 : prev + 1;
-      setTimeout(() => {
-        document.getElementById(`thumb-${nextIdx}`)?.scrollIntoView({
-          behavior: 'smooth',
-          inline: 'center',
-          block: 'nearest',
-        });
-      }, 50);
       return nextIdx;
     });
   };
+
+  const isCar = listing.category === 'Autoturisme' || listing.brand;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f6f6f6] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200">
@@ -447,6 +485,8 @@ export default function ListingDetailClient({
               <img
                 src={galleryImages[activeImageIdx]}
                 alt={listing.title}
+                loading="eager"
+                decoding="async"
                 className="w-full h-full object-contain bg-black/5 dark:bg-black/40 group-hover:scale-[1.01] transition-transform duration-300"
               />
 

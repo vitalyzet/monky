@@ -57,6 +57,7 @@ import {
   formatDistanceKm,
   Coordinates,
 } from '@/lib/geoUtils';
+import { prewarmAllListings } from '@/lib/adCache';
 
 const POPULAR_CAR_BRANDS = [
   'Audi',
@@ -255,6 +256,7 @@ function SearchContent() {
         });
 
         if (isMounted) {
+          prewarmAllListings(combined);
           setRealListings(combined);
           setLoading(false);
         }

@@ -115,6 +115,7 @@ export const saveListing = async (listingData: Omit<AdListing, 'id'>) => {
 
 let listingsCache: AdListing[] | null = null;
 let cacheTimestamp = 0;
+const individualListingCache = new Map<string, { listing: AdListing; expires: number }>();
 
 export const getListings = async (forceRefresh = false): Promise<AdListing[]> => {
   const now = Date.now();
@@ -136,12 +137,17 @@ export const getListings = async (forceRefresh = false): Promise<AdListing[]> =>
         return;
       }
       const timestamp = data.timestamp?.seconds ? { seconds: data.timestamp.seconds } : data.timestamp;
-      listings.push({
+      const item = {
         status: data.status || 'active',
         ...data,
         id: docSnap.id,
         timestamp,
-      } as AdListing);
+      } as AdListing;
+      listings.push(item);
+      individualListingCache.set(docSnap.id, { listing: item, expires: now + 300000 });
+      if (item.id) {
+        individualListingCache.set(item.id, { listing: item, expires: now + 300000 });
+      }
     });
     const sorted = listings.sort((a, b) => {
       const timeA = a.createdAtTime || (a.timestamp?.seconds ? a.timestamp.seconds * 1000 : 0);
@@ -189,14 +195,26 @@ import { extractListingId } from './slugUtils';
 export const getListingById = async (slugOrId: string): Promise<AdListing | null> => {
   if (!slugOrId) return null;
   const targetId = extractListingId(slugOrId);
+  const now = Date.now();
 
+  // 1. Instant in-memory cache lookup (0ms)
+  const cachedIndiv = individualListingCache.get(targetId) || individualListingCache.get(slugOrId);
+  if (cachedIndiv && cachedIndiv.expires > now) {
+    return cachedIndiv.listing;
+  }
+
+  // 2. Search in global listings cache if available
   if (listingsCache) {
     const cachedFound = listingsCache.find(
       (item) => item.id === targetId || item.id === slugOrId || (item.id && slugOrId.endsWith(item.id))
     );
-    if (cachedFound) return cachedFound;
+    if (cachedFound) {
+      individualListingCache.set(targetId, { listing: cachedFound, expires: now + 300000 });
+      return cachedFound;
+    }
   }
 
+  // 3. Direct Firestore document query
   try {
     let docRef = doc(db, LISTINGS_COLLECTION, targetId);
     let docSnap = await getDoc(docRef);
@@ -209,13 +227,17 @@ export const getListingById = async (slugOrId: string): Promise<AdListing | null
     if (docSnap.exists()) {
       const data = docSnap.data();
       const timestamp = data.timestamp?.seconds ? { seconds: data.timestamp.seconds } : data.timestamp;
-      return { 
+      const res = { 
         ...data, 
         id: docSnap.id,
         timestamp,
       } as AdListing;
+      individualListingCache.set(targetId, { listing: res, expires: now + 300000 });
+      individualListingCache.set(docSnap.id, { listing: res, expires: now + 300000 });
+      return res;
     }
 
+    // 4. Fallback search among all listings
     const allListings = await getListings();
     const shortSearch = slugOrId.split('-').pop()?.toLowerCase() || '';
 
@@ -229,7 +251,12 @@ export const getListingById = async (slugOrId: string): Promise<AdListing | null
         (shortSearch.length >= 4 && itemId.includes(shortSearch))
       );
     });
-    return found || null;
+
+    if (found) {
+      individualListingCache.set(targetId, { listing: found, expires: now + 300000 });
+      return found;
+    }
+    return null;
   } catch (error) {
     console.error("Error getting document:", error);
     return null;
@@ -393,7 +420,14 @@ export const saveOrUpdateUserInDb = async (profile: UserProfile) => {
   }
 };
 
-export const getAllUsersFromDb = async (): Promise<UserProfile[]> => {
+let usersCache: UserProfile[] | null = null;
+let usersCacheTimestamp = 0;
+
+export const getAllUsersFromDb = async (forceRefresh = false): Promise<UserProfile[]> => {
+  const now = Date.now();
+  if (!forceRefresh && usersCache && now - usersCacheTimestamp < 300000) {
+    return usersCache;
+  }
   try {
     const q = query(collection(db, USERS_COLLECTION));
     const querySnapshot = await getDocs(q);
@@ -404,10 +438,12 @@ export const getAllUsersFromDb = async (): Promise<UserProfile[]> => {
         uid: docSnap.id,
       } as UserProfile);
     });
+    usersCache = users;
+    usersCacheTimestamp = now;
     return users;
   } catch (error) {
     console.error("Error getting users: ", error);
-    return [];
+    return usersCache || [];
   }
 };
 
