@@ -34,7 +34,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { getDistinctSellerAvatar, resolveSellerAvatar } from '@/lib/avatarUtils';
 import { formatPublicName } from '@/lib/stringUtils';
 import { getListingDistanceKm, formatDistanceKm } from '@/lib/geoUtils';
-import { prewarmListing, prewarmAllListings } from '@/lib/adCache';
+import { prewarmListing, prewarmAllListings, recordCardClick } from '@/lib/adCache';
 
 export interface ActiveFilterChip {
   key: string;
@@ -162,6 +162,7 @@ export const CarListingCard: React.FC<{
         onTouchStart={() => prewarmListing(item)}
         className="flex flex-col h-full w-full bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer border border-transparent dark:border-[#2a2a2a]"
         onClick={() => {
+          recordCardClick(item);
           prewarmListing(item);
           if (onSelectListing) onSelectListing(item);
         }}
@@ -316,6 +317,7 @@ export const CarListingCard: React.FC<{
       onTouchStart={() => prewarmListing(item)}
       className="flex flex-col h-full w-full bg-white dark:bg-[#1c1e22] rounded-2xl border border-slate-200/80 dark:border-[#282a30] shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer text-inherit no-underline"
       onClick={() => {
+        recordCardClick(item);
         prewarmListing(item);
         if (onSelectListing) onSelectListing(item);
       }}
@@ -554,6 +556,7 @@ export const ListingListCard: React.FC<ListingListCardProps> = ({
       onTouchStart={() => prewarmListing(item)}
       className="bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 flex flex-row items-stretch h-[140px] xs:h-[155px] sm:h-[235px] md:h-[245px] group cursor-pointer overflow-hidden text-inherit no-underline"
       onClick={() => {
+        recordCardClick(item);
         prewarmListing(item);
         if (onSelectListing) onSelectListing(item);
       }}

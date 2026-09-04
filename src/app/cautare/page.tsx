@@ -129,12 +129,68 @@ function SearchContent() {
   const [sortBy, setSortBy] = useState<'distance' | 'newest' | 'price_asc' | 'price_desc'>('distance');
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [realListings, setRealListings] = useState<AdListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [realListings, setRealListings] = useState<AdListing[]>(() => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+        return (window as any).__MONKY_ALL_LISTINGS;
+      }
+      try {
+        const saved = sessionStorage.getItem('monky_cached_listings');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) return false;
+      if (sessionStorage.getItem('monky_cached_listings')) return false;
+    }
+    return true;
+  });
   const [isLocating, setIsLocating] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('monky_visible_count');
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 12) return parsed;
+      }
+    }
+    return 12;
+  });
+
+  // Seamless scroll restoration when returning from details page
+  useEffect(() => {
+    if (realListings.length > 0) {
+      try {
+        const savedScroll = sessionStorage.getItem('monky_scroll_pos');
+        const lastId = sessionStorage.getItem('lastViewedAdId');
+
+        if (savedScroll) {
+          const pos = parseInt(savedScroll, 10);
+          sessionStorage.removeItem('monky_scroll_pos');
+          sessionStorage.removeItem('lastViewedAdId');
+          if (!isNaN(pos) && pos > 0) {
+            window.scrollTo({ top: pos, behavior: 'instant' as any });
+            return;
+          }
+        }
+
+        if (lastId) {
+          sessionStorage.removeItem('lastViewedAdId');
+          const el = document.getElementById(`ad-card-${lastId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'instant' as any, block: 'center' });
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [realListings.length]);
 
   // Modern Publi24 Toolbar states
   const [sellerFilter, setSellerFilter] = useState<'all' | 'private' | 'company'>('all');
@@ -1141,7 +1197,15 @@ function SearchContent() {
             <div className="flex justify-center my-6">
               <button
                 type="button"
-                onClick={() => setVisibleCount((prev) => prev + 12)}
+                onClick={() => {
+                  setVisibleCount((prev) => {
+                    const next = prev + 12;
+                    try {
+                      sessionStorage.setItem('monky_visible_count', next.toString());
+                    } catch (e) {}
+                    return next;
+                  });
+                }}
                 className="bg-[#38d39f] hover:bg-[#31c794] active:scale-95 text-[#18222d] text-sm font-extrabold px-7 py-2.5 rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none"
               >
                 Încarcă mai multe

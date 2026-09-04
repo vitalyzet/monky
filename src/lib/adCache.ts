@@ -4,6 +4,7 @@ import { AdListing } from './db';
 declare global {
   interface Window {
     __MONKY_AD_CACHE?: Record<string, AdListing>;
+    __MONKY_ALL_LISTINGS?: AdListing[];
     __MONKY_IMG_PREFETCHED?: Set<string>;
   }
 }
@@ -21,7 +22,6 @@ export function prewarmListing(item: any) {
     // Store in sessionStorage for cross-navigation persistence
     sessionStorage.setItem(`monky_ad_${item.id}`, JSON.stringify(item));
     sessionStorage.setItem('monky_ad_active', JSON.stringify(item));
-    sessionStorage.setItem('lastViewedAdId', item.id);
 
     // Preload main image into browser memory so it renders in 0ms on click
     const mainImg = item.image || (item.gallery && item.gallery[0]);
@@ -39,11 +39,23 @@ export function prewarmListing(item: any) {
 }
 
 /**
+ * Saves current scroll position and clicked ad id before navigating
+ */
+export function recordCardClick(item: any) {
+  if (typeof window === 'undefined' || !item) return;
+  try {
+    sessionStorage.setItem('monky_scroll_pos', window.scrollY.toString());
+    sessionStorage.setItem('lastViewedAdId', item.id);
+  } catch (e) {}
+}
+
+/**
  * Bulk pre-warms all listings when entering search page or homepage
  */
 export function prewarmAllListings(listings: any[]) {
   if (typeof window === 'undefined' || !listings || listings.length === 0) return;
   try {
+    window.__MONKY_ALL_LISTINGS = listings;
     window.__MONKY_AD_CACHE = window.__MONKY_AD_CACHE || {};
     listings.forEach((item) => {
       if (item && item.id) {
@@ -53,6 +65,31 @@ export function prewarmAllListings(listings: any[]) {
         } catch (e) {}
       }
     });
+
+    // Save lightweight copy of listings to sessionStorage to prevent layout collapse when navigating back
+    try {
+      const lightweight = listings.slice(0, 100).map((ad) => ({
+        id: ad.id,
+        title: ad.title,
+        price: ad.price,
+        currency: ad.currency,
+        image: ad.image,
+        gallery: ad.gallery?.slice(0, 3),
+        location: ad.location,
+        category: ad.category,
+        brand: ad.brand,
+        model: ad.model,
+        year: ad.year,
+        mileage: ad.mileage,
+        fuel: ad.fuel,
+        transmission: ad.transmission,
+        seller: ad.seller,
+        isPromoted: ad.isPromoted,
+        timestamp: ad.timestamp,
+        createdAtTime: ad.createdAtTime,
+      }));
+      sessionStorage.setItem('monky_cached_listings', JSON.stringify(lightweight));
+    } catch (e) {}
   } catch (e) {}
 }
 

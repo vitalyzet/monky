@@ -96,8 +96,25 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [realListings, setRealListings] = useState<AdListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [realListings, setRealListings] = useState<AdListing[]>(() => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+        return (window as any).__MONKY_ALL_LISTINGS;
+      }
+      try {
+        const saved = sessionStorage.getItem('monky_cached_listings');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined') {
+      if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) return false;
+      if (sessionStorage.getItem('monky_cached_listings')) return false;
+    }
+    return true;
+  });
 
   // Load favorites, active tab & real listings from Firestore + localStorage + sessionStorage on mount
   useEffect(() => {
@@ -200,25 +217,44 @@ export default function HomePage() {
 
   // Restore scroll position to last viewed ad card when returning from details page
   useEffect(() => {
-    if (!loading) {
+    if (realListings.length > 0) {
       try {
+        const savedScroll = sessionStorage.getItem('monky_scroll_pos');
         const lastId = sessionStorage.getItem('lastViewedAdId');
+
+        if (savedScroll) {
+          const pos = parseInt(savedScroll, 10);
+          sessionStorage.removeItem('monky_scroll_pos');
+          sessionStorage.removeItem('lastViewedAdId');
+          if (!isNaN(pos) && pos > 0) {
+            window.scrollTo({ top: pos, behavior: 'instant' as any });
+            return;
+          }
+        }
+
         if (lastId) {
           sessionStorage.removeItem('lastViewedAdId');
-          setTimeout(() => {
-            const el = document.getElementById(`ad-card-${lastId}`);
-            if (el) {
-              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-          }, 300);
+          const el = document.getElementById(`ad-card-${lastId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'instant' as any, block: 'center' });
+          }
         }
       } catch (e) {
         console.error(e);
       }
     }
-  }, [loading]);
+  }, [realListings.length]);
 
-  const [visibleCount, setVisibleCount] = useState(24);
+  const [visibleCount, setVisibleCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('monky_visible_count');
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 24) return parsed;
+      }
+    }
+    return 24;
+  });
   const [showStickyHeader, setShowStickyHeader] = useState(false);
 
   // Scroll listener to toggle floating sticky search header when scrolling past main search box
@@ -550,7 +586,15 @@ export default function HomePage() {
                 <div className="flex justify-center my-6">
                   <button
                     type="button"
-                    onClick={() => setVisibleCount((prev) => prev + 24)}
+                    onClick={() => {
+                      setVisibleCount((prev) => {
+                        const next = prev + 24;
+                        try {
+                          sessionStorage.setItem('monky_visible_count', next.toString());
+                        } catch (e) {}
+                        return next;
+                      });
+                    }}
                     className="bg-[#38d39f] hover:bg-[#31c794] active:scale-95 text-[#18222d] text-sm font-extrabold px-7 py-2.5 rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none"
                   >
                     Încarcă mai multe
