@@ -49,14 +49,14 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
   };
 
   return (
-    <section className="my-7 w-full overflow-hidden relative z-10 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#d5f2ec] to-[#e4f7f2] dark:from-[#1b2b28] dark:to-[#152320] border border-[#bce8df] dark:border-[#2a4641] shadow-xs p-4 sm:p-5 md:p-6 space-y-4">
+    <section className="my-7 w-full overflow-hidden relative z-10 rounded-2xl sm:rounded-3xl bg-gradient-to-b from-[#d5f2ec] to-[#e4f7f2] dark:from-[#1b1c20] dark:to-[#121316] border border-[#bce8df] dark:border-white/10 shadow-xs p-4 sm:p-5 md:p-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between px-0.5">
         <div className="flex items-center gap-2.5">
           <h2 className="text-xl sm:text-2xl font-black text-[#142825] dark:text-white tracking-tight">
             Explorează după categorie
           </h2>
-          <span className="text-xs font-extrabold px-3 py-0.5 rounded-full bg-white/85 dark:bg-[#203a35] text-[#039e84] dark:text-[#03c1a2] border border-[#bce8df] dark:border-[#2f554e] shadow-xs">
+          <span className="text-xs font-extrabold px-3 py-0.5 rounded-full bg-white/85 dark:bg-white/10 text-[#039e84] dark:text-white border border-[#bce8df] dark:border-white/15 shadow-xs">
             {OFFICIAL_CATEGORIES.length} categorii
           </span>
         </div>
@@ -69,7 +69,7 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
           <button
             type="button"
             onClick={scrollLeft}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2.5 sm:-translate-x-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white dark:bg-[#203a35] border border-[#bce8df] dark:border-[#2f554e] shadow-md flex items-center justify-center text-[#142825] dark:text-slate-200 hover:scale-110 active:scale-95 transition-all z-20 outline-none select-none hover:text-[#03c1a2]"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2.5 sm:-translate-x-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white dark:bg-[#22242a] border border-[#bce8df] dark:border-white/15 shadow-md flex items-center justify-center text-[#142825] dark:text-white hover:scale-110 active:scale-95 transition-all z-20 outline-none select-none hover:text-[#03c1a2] dark:hover:text-[#03c1a2]"
             title="Derulează la stânga"
           >
             <ChevronLeft size={18} />
@@ -81,7 +81,7 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
           <button
             type="button"
             onClick={scrollRight}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2.5 sm:translate-x-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white dark:bg-[#203a35] border border-[#bce8df] dark:border-[#2f554e] shadow-md flex items-center justify-center text-[#142825] dark:text-slate-200 hover:scale-110 active:scale-95 transition-all z-20 outline-none select-none hover:text-[#03c1a2]"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2.5 sm:translate-x-3.5 w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white dark:bg-[#22242a] border border-[#bce8df] dark:border-white/15 shadow-md flex items-center justify-center text-[#142825] dark:text-white hover:scale-110 active:scale-95 transition-all z-20 outline-none select-none hover:text-[#03c1a2] dark:hover:text-[#03c1a2]"
             title="Derulează la dreapta"
           >
             <ChevronRight size={18} />
@@ -108,7 +108,7 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
                   isMounted ? 'animate-card-enter' : 'opacity-0'
                 }`}
               >
-                <div className="w-[72px] h-[60px] xs:w-[84px] xs:h-[70px] sm:w-[104px] sm:h-[82px] rounded-xl sm:rounded-2xl overflow-hidden border border-white/90 dark:border-[#2f4943] bg-white dark:bg-[#1a2d28] shadow-xs flex items-center justify-center relative transition-all duration-300 ease-out group-hover/card:border-[#03c1a2] group-hover/card:shadow-[0_12px_26px_-4px_rgba(3,193,162,0.4)] group-hover/card:scale-105 active:scale-95">
+                <div className="w-[72px] h-[60px] xs:w-[84px] xs:h-[70px] sm:w-[104px] sm:h-[82px] rounded-xl sm:rounded-2xl overflow-hidden border border-white/90 dark:border-white/10 bg-white dark:bg-[#202227] shadow-xs flex items-center justify-center relative transition-all duration-300 ease-out group-hover/card:border-[#03c1a2] group-hover/card:shadow-[0_12px_26px_-4px_rgba(3,193,162,0.4)] group-hover/card:scale-105 active:scale-95">
                   <img
                     src={cat.image}
                     alt={cat.name}
@@ -116,7 +116,7 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
                   />
                   <div className="card-sheen-sweep" />
                 </div>
-                <span className="text-[10px] xs:text-[11px] sm:text-[12px] font-bold text-[#1a332f] dark:text-slate-200 group-hover/card:text-[#039e84] dark:group-hover/card:text-[#03c1a2] group-hover/card:-translate-y-0.5 leading-snug text-center mt-1.5 sm:mt-2 line-clamp-2 px-0.5 max-w-[80px] xs:max-w-[90px] sm:max-w-[100px] transition-all duration-200">
+                <span className="text-[10px] xs:text-[11px] sm:text-[12px] font-bold text-[#1a332f] dark:text-white group-hover/card:text-[#039e84] dark:group-hover/card:text-[#03c1a2] group-hover/card:-translate-y-0.5 leading-snug text-center mt-1.5 sm:mt-2 line-clamp-2 px-0.5 max-w-[80px] xs:max-w-[90px] sm:max-w-[100px] transition-all duration-200">
                   {cat.name}
                 </span>
               </button>
