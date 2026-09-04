@@ -156,7 +156,7 @@ export const CarListingCard: React.FC<{
       <Link
         id={`ad-card-${item.id}`}
         href={getListingUrl(item)}
-        className="flex flex-col h-full w-full bg-white dark:bg-[#1a1a1a] rounded-2xl sm:rounded-[22px] border border-slate-200/80 dark:border-[#2a2a2a] shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden group cursor-pointer"
+        className="flex flex-col h-full w-full bg-white dark:bg-[#1e1e1e] rounded-2xl shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer border border-transparent dark:border-[#2a2a2a]"
         onClick={() => {
           if (typeof window !== 'undefined') {
             sessionStorage.setItem('lastViewedAdId', item.id);
@@ -164,123 +164,139 @@ export const CarListingCard: React.FC<{
           if (onSelectListing) onSelectListing(item);
         }}
       >
-        {/* Top Photo Frame */}
-        <div className="p-1.5 sm:p-2 pb-0">
-          <div className="relative aspect-[4/3] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#181818] overflow-hidden rounded-xl sm:rounded-[18px]">
-            <img
-              src={images[currentIdx] || item.image || '/42.svg'}
-              alt={item.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/42.svg';
-              }}
+        {/* Top Photo Frame (Flush with edges) */}
+        <div className="relative aspect-[4/3] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#111111] overflow-hidden">
+          <img
+            src={images[currentIdx] || item.image || '/42.svg'}
+            alt={item.title}
+            className="absolute inset-0 w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/42.svg';
+            }}
+          />
+
+          {/* Gradient Overlay for bottom shadow (for dots) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+
+          {/* Badge top-left (Anunț Nou style) */}
+          <div className="absolute top-3 left-3 flex items-center gap-1 z-10 pointer-events-none">
+            {item.isPromoted ? (
+              <span className="bg-amber-500 text-slate-950 font-medium text-[11px] px-2.5 py-1 rounded-full shadow-sm">
+                Promovat
+              </span>
+            ) : (
+              <span className="bg-[#7cd95b] text-white font-medium text-[11px] px-2.5 py-1 rounded-full shadow-sm">
+                Anunț Nou
+              </span>
+            )}
+          </div>
+
+          {/* Heart Button top-right */}
+          <button
+            type="button"
+            className="absolute top-3 right-3 w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-black/40 hover:bg-black/60 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 cursor-pointer"
+            onClick={(e) => onToggleFavorite(item.id, e)}
+            title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
+          >
+            <Heart
+              size={18}
+              className={isFav ? 'fill-red-500 text-red-500' : 'text-white stroke-[2]'}
             />
+          </button>
 
-            {/* Left/Right arrow on hover if multiple images */}
-            {images.length > 1 && currentIdx > 0 && (
-              <button
-                type="button"
-                onClick={prevImage}
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
-                title="Fotografia anterioară"
-              >
-                <ChevronLeft size={15} />
-              </button>
-            )}
-            {images.length > 1 && currentIdx < images.length - 1 && (
-              <button
-                type="button"
-                onClick={nextImage}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
-                title="Fotografia următoare"
-              >
-                <ChevronRight size={15} />
-              </button>
-            )}
-
-            {/* Floating Heart Button in dark circular blur */}
+          {/* Left/Right arrow on hover if multiple images */}
+          {images.length > 1 && currentIdx > 0 && (
             <button
               type="button"
-              className="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 w-7 h-7 sm:w-[34px] sm:h-[34px] rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer shadow-sm"
-              onClick={(e) => onToggleFavorite(item.id, e)}
-              title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
+              onClick={prevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center shadow-md hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
             >
-              <Heart
-                size={14}
-                className={isFav ? 'fill-red-500 text-red-500' : 'text-white'}
-              />
+              <ChevronLeft size={18} />
             </button>
+          )}
+          {images.length > 1 && currentIdx < images.length - 1 && (
+            <button
+              type="button"
+              onClick={nextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 text-white flex items-center justify-center shadow-md hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
+            >
+              <ChevronRight size={18} />
+            </button>
+          )}
 
-            {/* Floating Year Badge for Cars */}
-            {(() => {
-              const resolvedYear = item.year || (() => {
-                const match = (item.title || '').match(/\b(19\d\d|20[0-2]\d)\b/);
-                return match ? match[0] : null;
-              })();
-
-              if (resolvedYear) {
-                return (
-                  <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] sm:text-[11.5px] font-extrabold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full flex items-center gap-1 shadow-sm pointer-events-none">
-                    <Calendar size={11} className="text-white" />
-                    <span>{resolvedYear}</span>
-                  </div>
-                );
-              }
-
-              if (item.hasShipping) {
-                return (
-                  <div className="absolute bottom-1.5 left-1.5 sm:bottom-2.5 sm:left-2.5 bg-black/55 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full flex items-center gap-1 shadow-sm pointer-events-none">
-                    <Truck size={11} className="text-white" />
-                    <span>Livrare</span>
-                  </div>
-                );
-              }
-
-              return null;
-            })()}
-          </div>
+          {/* Carousel Dots */}
+          {images.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+              {images.slice(0, 5).map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`rounded-full transition-all duration-300 shadow-sm ${
+                    idx === currentIdx % 5
+                      ? 'w-2 h-2 bg-white scale-110'
+                      : 'w-1.5 h-1.5 bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Card Content Body */}
-        <div className="p-2.5 sm:p-3.5 pt-2 sm:pt-2.5 flex flex-col justify-between flex-grow">
+        <div className="p-3.5 sm:p-4 flex flex-col justify-between flex-grow bg-white dark:bg-[#1e1e1e]">
           <div>
-            {/* Price */}
-            <div className="text-sm sm:text-base md:text-[17px] font-black text-slate-900 dark:text-white mb-0.5 tracking-tight truncate">
-              {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
-                ? `${Number(item.price).toLocaleString('ro-RO')} ${String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? 'Lei' : item.currency || '€'}`
-                : 'Preț la cerere'}
+            {/* Price Row */}
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
+                  ? `${Number(item.price).toLocaleString('ro-RO')} ${String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? '€' : item.currency || '€'}`
+                  : 'Preț la cerere'}
+              </div>
+              <div className="text-slate-400 dark:text-slate-500 font-bold tracking-widest leading-none">
+                ...
+              </div>
             </div>
 
-            {/* Title */}
-            <h3 className="text-xs sm:text-[14px] font-semibold text-slate-800 dark:text-slate-100 leading-snug line-clamp-1 mb-1 group-hover:text-[#03c1a2] transition-colors" title={item.title}>
+            {/* Title (Hidden in user's screenshot, but we keep it small or we can replace it) */}
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 leading-snug line-clamp-1 mb-2">
               {item.title}
             </h3>
 
             {/* Location & Distance */}
-            <div className="flex items-center gap-1 text-[11px] sm:text-[12px] text-slate-400 dark:text-slate-400 font-normal truncate">
-              <Navigation size={11} className="rotate-45 text-slate-400 flex-shrink-0" />
-              <span className="truncate">{item.location || 'România'} {distanceKm !== null ? `· ${formatDistanceKm(distanceKm)}` : ''}</span>
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-[#a0a0a0] mb-3 truncate">
+              <MapPin size={13} className="text-slate-400 dark:text-[#808080] flex-shrink-0" />
+              <span className="truncate">{item.location || 'România'}</span>
+              {distanceKm !== null && (
+                <span className="ml-1 text-[11px] text-[#03c1a2] bg-[#03c1a2]/10 px-1.5 rounded">
+                  {formatDistanceKm(distanceKm)}
+                </span>
+              )}
             </div>
-          </div>
 
-          {/* User / Seller Row */}
-          <div className="mt-2 pt-1.5 sm:mt-2.5 sm:pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-1 sm:gap-2">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <img
-                src={sellerAvatar}
-                alt=""
-                className="w-[18px] h-[18px] sm:w-5 sm:h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-2xs"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = getDistinctSellerAvatar(item.seller?.name, (item as any).userId);
-                }}
-              />
-              <span className="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-300 truncate font-medium">
-                {formatPublicName(item.seller?.name || 'Vânzător')}
-              </span>
-            </div>
-            <span className="text-[9.5px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
-              {formatTimeAgo(item.createdAt)}
-            </span>
+            {/* Specs Pills (Mimicking the screenshot tags) */}
+            {(item.mileage || item.fuel || item.year || item.transmission) && (
+              <div className="flex flex-wrap items-center gap-2">
+                {resolvedYear && (
+                  <span className="bg-slate-100 dark:bg-[#333333] text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-transparent dark:border-[#444444]">
+                    {resolvedYear}
+                  </span>
+                )}
+                {item.mileage && (
+                  <span className="bg-slate-100 dark:bg-[#333333] text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-transparent dark:border-[#444444]">
+                    {formatMileage(item.mileage)}
+                  </span>
+                )}
+                {item.fuel && (
+                  <span className="bg-slate-100 dark:bg-[#333333] text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-transparent dark:border-[#444444]">
+                    {item.fuel}
+                  </span>
+                )}
+                {item.transmission && (
+                  <span className="bg-slate-100 dark:bg-[#333333] text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium border border-transparent dark:border-[#444444]">
+                    {item.transmission}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </Link>
@@ -301,7 +317,7 @@ export const CarListingCard: React.FC<{
     >
       {/* Top Photo Frame - 100% clean photo with sleek favorite button */}
       <div className="p-1 sm:p-1.5 pb-0">
-        <div className="relative aspect-[16/12] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#141518] overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200/60 dark:border-slate-800">
+        <div className="relative aspect-video sm:aspect-[16/12] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#141518] overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200/60 dark:border-slate-800">
           <img
             src={images[currentIdx] || item.image || '/images/car_audi_a4.png'}
             alt={item.title}
@@ -816,8 +832,8 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
           ))}
         </div>
       ) : (
-        /* Modern Grid View (1-col mobile, 2-col sm, 3-col md, 4-col lg, 5-col xl) */
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-5 mb-10">
+        /* Modern Grid View (2-col mobile, 2-col sm, 3-col md, 4-col lg, 5-col xl) */
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 mb-10">
           {listings.map((item) => (
             <CarListingCard
               key={item.id}

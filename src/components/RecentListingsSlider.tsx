@@ -144,11 +144,11 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
                 }
                 if (onSelectListing) onSelectListing(item);
               }}
-              className="w-[calc(100%-12px)] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] xl:w-[calc(20%-12px)] flex-shrink-0 snap-start bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-[#03c1a2]/60 dark:hover:border-[#03c1a2]/50 transition-all duration-200 group cursor-pointer overflow-hidden flex flex-col justify-between block text-inherit no-underline"
+              className="w-[180px] xs:w-[200px] sm:w-[calc(50%-12px)] md:w-[calc(33.333%-12px)] lg:w-[calc(25%-12px)] xl:w-[calc(20%-12px)] flex-shrink-0 snap-start bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-[#03c1a2]/60 dark:hover:border-[#03c1a2]/50 transition-all duration-200 group cursor-pointer overflow-hidden flex flex-col justify-between block text-inherit no-underline"
             >
               {/* Photo Media */}
               <div>
-                <div className="relative aspect-[4/3] w-full bg-slate-100 dark:bg-[#141c24] overflow-hidden">
+                <div className="relative aspect-video w-full bg-slate-100 dark:bg-[#141c24] overflow-hidden">
                   <img
                     src={item.image || '/42.svg'}
                     alt={item.title}
