@@ -248,7 +248,6 @@ input, select {
   font-weight: 600;
   font-size: var(--sbt-body-text-font-size-secondary);
   color: #475569;
-  display: flex;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
@@ -273,22 +272,21 @@ input, select {
 }
 
 .nav-btn-primary {
-  background: #f97316;
-  color: var(--sbt-white);
+  background: #03c1a2;
+  color: #ffffff;
   font-weight: 700;
   font-size: 14px;
   height: 40px;
   padding: 0 20px;
   border-radius: var(--sbt-corner-full);
-  display: flex;
   align-items: center;
   gap: 6px;
   border: none;
-  transition: background-color 0.15s;
+  transition: all 0.15s;
 }
 
 .nav-btn-primary:hover {
-  background: #ea580c;
+  background: #02a88d;
 }
 
 /* Subito Hero Search Box Container */

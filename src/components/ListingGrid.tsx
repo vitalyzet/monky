@@ -349,12 +349,12 @@ export const CarListingCard: React.FC<{
       </div>
 
       {/* Card Content Body */}
-      <div className="p-3.5 pt-3 flex flex-col justify-between flex-grow">
+      <div className="p-2.5 sm:p-3.5 pt-2 sm:pt-3 flex flex-col justify-between flex-grow">
         <div>
           {/* Distinct Modern Price & Brand Row */}
-          <div className="flex items-baseline justify-between gap-2 mb-1.5">
+          <div className="flex items-baseline justify-between gap-1.5 mb-1">
             <div className="flex items-baseline gap-1">
-              <span className="text-lg sm:text-[21px] font-black text-slate-900 dark:text-white tracking-tight">
+              <span className="text-sm sm:text-lg md:text-[20px] font-black text-slate-900 dark:text-white tracking-tight truncate">
                 {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
                   ? Number(item.price).toLocaleString('ro-RO')
                   : 'Preț la cerere'}
@@ -368,21 +368,32 @@ export const CarListingCard: React.FC<{
 
             {/* Brand Tag Pill */}
             {resolvedBrand && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] border border-slate-200/90 dark:border-[#383838] px-2 py-0.5 rounded-full flex-shrink-0">
-                <Tag size={9} className="text-slate-400" />
+              <span className="inline-flex items-center gap-1 text-[9px] sm:text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] border border-slate-200/90 dark:border-[#383838] px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0">
+                <Tag size={8} className="text-slate-400" />
                 {resolvedBrand}
               </span>
             )}
           </div>
 
           {/* Title */}
-          <h3 className="text-xs sm:text-[14px] font-bold text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 group-hover:text-[#03c1a2] transition-colors mb-1.5 min-h-[36px]" title={item.title}>
+          <h3 className="text-xs sm:text-[14px] font-semibold text-slate-800 dark:text-slate-100 leading-snug line-clamp-1 group-hover:text-[#03c1a2] transition-colors mb-1" title={item.title}>
             {item.title}
           </h3>
 
-          {/* Kilometers (Mileage) & Fuel (Combustibil) & Gearbox (Caja cambio) & Year Pills */}
+          {/* Mobile Specs Summary (Dot separated) */}
           {(item.mileage || item.fuel || item.transmission || item.year) && (
-            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+            <div className="flex sm:hidden items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 font-medium mb-1.5 truncate">
+              {item.year && <span>{item.year}</span>}
+              {item.year && item.mileage && <span>•</span>}
+              {item.mileage && <span className="truncate">{formatMileage(item.mileage)}</span>}
+              {item.mileage && item.fuel && <span>•</span>}
+              {item.fuel && <span>{item.fuel}</span>}
+            </div>
+          )}
+
+          {/* Desktop Kilometers & Fuel & Gearbox Pills */}
+          {(item.mileage || item.fuel || item.transmission || item.year) && (
+            <div className="hidden sm:flex flex-wrap items-center gap-1.5 mb-2">
               {item.mileage && (
                 <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-[#383838]">
                   <Gauge size={11} className="text-slate-400 flex-shrink-0" />
@@ -411,13 +422,13 @@ export const CarListingCard: React.FC<{
           )}
 
           {/* Location and Distance in Kilometers */}
-          <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 gap-1.5">
+          <div className="flex items-center justify-between text-[10.5px] sm:text-[11px] text-slate-400 dark:text-slate-500 gap-1">
             <span className="truncate flex items-center gap-1">
-              <MapPin size={11} className="text-slate-400 flex-shrink-0" />
-              <span>{item.location || 'România'}</span>
+              <MapPin size={10} className="text-slate-400 flex-shrink-0" />
+              <span className="truncate">{item.location || 'România'}</span>
             </span>
             {distanceKm !== null && (
-              <span className="flex-shrink-0 font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#282828] border border-slate-200/80 dark:border-[#383838] px-2 py-0.5 rounded-full text-[10px] flex items-center gap-0.5">
+              <span className="flex-shrink-0 font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#282828] border border-slate-200/80 dark:border-[#383838] px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] flex items-center gap-0.5">
                 📍 {formatDistanceKm(distanceKm)}
               </span>
             )}
@@ -425,24 +436,24 @@ export const CarListingCard: React.FC<{
         </div>
 
         {/* Seller Footer with Publication Time */}
-        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-[#2a2a2a] flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1.5 min-w-0">
+        <div className="mt-2 sm:mt-2.5 pt-1.5 sm:pt-2 border-t border-slate-100 dark:border-[#2a2a2a] flex items-center justify-between gap-1 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
             <img
               src={sellerAvatar}
               alt=""
-              className="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0"
+              className="w-4 h-4 sm:w-5 sm:h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = getDistinctSellerAvatar(item.seller?.name, (item as any).userId);
               }}
             />
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-medium">
+            <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate font-medium">
               {formatPublicName(item.seller?.name || 'Vânzător')}
             </span>
           </div>
 
           {/* When the ad was published */}
-          <span className="flex items-center gap-1 text-[10.5px] text-slate-400 dark:text-slate-500 flex-shrink-0 font-medium" title="Data publicării">
-            <Clock size={11} className="text-slate-400 flex-shrink-0" />
+          <span className="flex items-center gap-1 text-[9.5px] sm:text-[10.5px] text-slate-400 dark:text-slate-500 flex-shrink-0 font-medium" title="Data publicării">
+            <Clock size={10} className="text-slate-400 flex-shrink-0" />
             <span>{formatRealListingDate(item)}</span>
           </span>
         </div>

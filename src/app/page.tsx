@@ -516,8 +516,8 @@ export default function HomePage() {
           />
         )}
 
-        {/* Container Section Underneath Categories */}
-        <section className="w-full bg-[#F2F3F6] dark:bg-[#1a222d] rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-5 border border-slate-200/80 dark:border-[#2d3b49] shadow-xs my-6">
+        {/* Listings Section */}
+        <section className="w-full my-6">
           {loading ? (
             <div className="flex justify-center items-center py-24">
               <p className="text-slate-500 font-semibold animate-pulse">Se încarcă anunțurile...</p>

@@ -144,7 +144,7 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
                 }
                 if (onSelectListing) onSelectListing(item);
               }}
-              className="w-[210px] xs:w-[230px] sm:w-[250px] flex-shrink-0 bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-[#03c1a2]/60 dark:hover:border-[#03c1a2]/50 transition-all duration-200 group cursor-pointer overflow-hidden flex flex-col justify-between block text-inherit no-underline"
+              className="w-[165px] xs:w-[185px] sm:w-[240px] flex-shrink-0 bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-[#03c1a2]/60 dark:hover:border-[#03c1a2]/50 transition-all duration-200 group cursor-pointer overflow-hidden flex flex-col justify-between block text-inherit no-underline"
             >
               {/* Photo Media */}
               <div>
@@ -164,12 +164,12 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
                   {/* Top Left Badge */}
                   <div className="absolute top-2 left-2 flex items-center gap-1 pointer-events-none">
                     {item.isPromoted ? (
-                      <span className="bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-md uppercase tracking-wider shadow-xs flex items-center gap-1">
-                        <Sparkles size={9} />
+                      <span className="bg-amber-500 text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-xs flex items-center gap-0.5">
+                        <Sparkles size={8} />
                         <span>Promovat</span>
                       </span>
                     ) : (
-                      <span className="bg-[#03c1a2] text-white font-black text-[9px] px-2 py-0.5 rounded-md uppercase tracking-wider shadow-xs">
+                      <span className="bg-[#03c1a2] text-slate-950 font-black text-[9px] px-1.5 py-0.5 rounded uppercase tracking-wider shadow-xs">
                         NOU
                       </span>
                     )}
@@ -178,7 +178,7 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
                   {/* Top Right Heart Button */}
                   <button
                     type="button"
-                    className="absolute top-2 right-2 w-7.5 h-7.5 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center shadow-md z-10 transition-all active:scale-90 hover:scale-105 cursor-pointer"
+                    className="absolute top-1.5 right-1.5 w-7 h-7 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center shadow-md z-10 transition-all active:scale-90 hover:scale-105 cursor-pointer"
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
@@ -187,39 +187,34 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
                     title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
                   >
                     <Heart
-                      size={14}
+                      size={13}
                       className={isFav ? 'fill-red-500 text-red-500' : 'text-white'}
                     />
                   </button>
 
                   {/* Bottom Year Pill */}
                   {resolvedYear && (
-                    <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs pointer-events-none border border-white/10">
-                      <Calendar size={11} className="text-[#03c1a2]" />
+                    <div className="absolute bottom-1.5 left-1.5 bg-black/70 backdrop-blur-md text-white text-[10px] sm:text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs pointer-events-none border border-white/10">
+                      <Calendar size={10} className="text-[#03c1a2]" />
                       <span>{resolvedYear}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Content Area */}
-                <div className="p-3">
+                <div className="p-2.5 sm:p-3">
                   {/* Price */}
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-lg font-black text-slate-900 dark:text-white tracking-tight">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate">
                       {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
                         ? `${Number(item.price).toLocaleString('ro-RO')} ${String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? 'Lei' : item.currency || '€'}`
                         : 'Preț la cerere'}
                     </span>
-                    {item.isNegotiable && (
-                      <span className="text-[11px] text-slate-400 font-medium">
-                        neg.
-                      </span>
-                    )}
                   </div>
 
                   {/* Title */}
                   <h3
-                    className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug group-hover:text-[#03c1a2] transition-colors mt-1 line-clamp-1 truncate"
+                    className="text-xs sm:text-sm font-semibold text-slate-800 dark:text-slate-100 leading-snug group-hover:text-[#03c1a2] transition-colors mt-0.5 line-clamp-1 truncate"
                     title={item.title}
                   >
                     {item.title}
@@ -227,7 +222,7 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
 
                   {/* Quick Specs (if car) */}
                   {(item.mileage || item.fuel) && (
-                    <div className="flex items-center gap-2 mt-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                    <div className="flex items-center gap-1.5 mt-1 text-[10.5px] font-medium text-slate-500 dark:text-slate-400 truncate">
                       {item.mileage && (
                         <span className="truncate">{formatMileage(item.mileage)}</span>
                       )}
@@ -239,12 +234,12 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
               </div>
 
               {/* Footer Row */}
-              <div className="px-3 pb-3 pt-1 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10.5px] text-slate-400">
-                <span className="truncate max-w-[120px]">
+              <div className="px-2.5 sm:px-3 pb-2.5 pt-1 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+                <span className="truncate max-w-[85px] sm:max-w-[120px]">
                   {item.location || 'România'}
                 </span>
                 <span className="flex items-center gap-1 flex-shrink-0">
-                  <Clock size={10} />
+                  <Clock size={9} />
                   <span>{formatRealListingDate(item)}</span>
                 </span>
               </div>
