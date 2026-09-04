@@ -98,6 +98,9 @@ export const metadata: Metadata = {
     apple: '/6ba82cfe-a73d-4741-9f6b-3916424ba990.png',
   },
   category: 'classifieds',
+  verification: {
+    google: 'bomgAyB3XBbQpKgKW_ZFwyg1dNXpNRO9NSvZ6Jou21A',
+  },
 };
 
 const jsonLdWebSite = {
