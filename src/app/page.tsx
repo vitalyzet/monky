@@ -476,6 +476,9 @@ export default function HomePage() {
       />
 
       <main className="main-container flex-grow">
+        {/* Semantic H1 for Google SEO */}
+        <h1 className="sr-only">Tevinde.ro - Anunțuri Gratuite Auto, Moto, Imobiliare și Tehnologie în România</h1>
+
         {/* Upper Search Bar */}
         <SearchFilterBox
           searchQuery={searchQuery}
