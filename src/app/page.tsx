@@ -1,15 +1,25 @@
 'use client';
 
+import { isCategoryMatch, APP_CATEGORIES } from '@/data/categories';
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { SearchFilterBox } from '@/components/SearchFilterBox';
 import { CategoryExplore } from '@/components/CategoryExplore';
+import { RecentListingsSlider } from '@/components/RecentListingsSlider';
 import { ListingGrid, ActiveFilterChip } from '@/components/ListingGrid';
 import { SuggestedSearches } from '@/components/SuggestedSearches';
 import { Footer } from '@/components/Footer';
-import { MOCK_LISTINGS, Listing, CATEGORIES } from '@/data/mockData';
+import { Listing, CATEGORIES } from '@/data/mockData';
+import { getListings, AdListing } from '@/lib/db';
+import { normalizeText } from '@/lib/stringUtils';
 
 const TYPE_TO_CAT_MAP: Record<string, string> = {
+  'Tehnologie și electronică': 'tehnologie-electronica',
+  'Încărcătoare & Cabluri': 'incarcatoare-cabluri',
+  'Huse & Folii protecție': 'huse-folii',
+  'Baterii externe': 'baterii-externe',
+  'Accesorii telefoane': 'accesorii-telefoane',
   'Mașină': 'car',
   'Motociclete și scutere': 'moto',
   'Accesorii auto': 'auto-acc',
@@ -17,9 +27,34 @@ const TYPE_TO_CAT_MAP: Record<string, string> = {
   'Rulote și rulote': 'camper',
   'Vehicule comerciale': 'commercial',
   'Nautic': 'nautical',
+  'Biciclete': 'biciclete',
+  'Mobilă și articole de uz casnic': 'mobila',
+  'Grădină și bricolaj': 'bricolaj',
+  'Obiecte de colecție': 'colectie',
+  'Telefonie': 'telefonie',
+  'Electrocasnice': 'electrocasnice',
+  'Audio/Video': 'audiovideo',
+  'Sport': 'sport',
+  'Informatică': 'informatica',
+  'Console și jocuri video': 'console',
+  'Animale': 'animale',
+  'Îmbrăcăminte și accesorii': 'haine',
+  'Totul pentru copii': 'copii',
+  'Fotografie': 'fotografie',
+  'Instrumente muzicale': 'muzica',
+  'Cărți și reviste': 'carti',
+  'Accesorii pentru animale de companie': 'accesorii_animale',
+  'Muzică și film': 'vinil',
+  'Case și apartamente': 'real-estate',
+  'Locuri de muncă': 'jobs'
 };
 
 const CAT_TO_TYPE_MAP: Record<string, string> = {
+  'tehnologie-electronica': 'Tehnologie și electronică',
+  'incarcatoare-cabluri': 'Încărcătoare & Cabluri',
+  'huse-folii': 'Huse & Folii protecție',
+  'baterii-externe': 'Baterii externe',
+  'accesorii-telefoane': 'Accesorii telefoane',
   'car': 'Mașină',
   'moto': 'Motociclete și scutere',
   'auto-acc': 'Accesorii auto',
@@ -27,6 +62,26 @@ const CAT_TO_TYPE_MAP: Record<string, string> = {
   'camper': 'Rulote și rulote',
   'commercial': 'Vehicule comerciale',
   'nautical': 'Nautic',
+  'biciclete': 'Biciclete',
+  'mobila': 'Mobilă și articole de uz casnic',
+  'bricolaj': 'Grădină și bricolaj',
+  'colectie': 'Obiecte de colecție',
+  'telefonie': 'Telefonie',
+  'electrocasnice': 'Electrocasnice',
+  'audiovideo': 'Audio/Video',
+  'sport': 'Sport',
+  'informatica': 'Informatică',
+  'console': 'Console și jocuri video',
+  'animale': 'Animale',
+  'haine': 'Îmbrăcăminte și accesorii',
+  'copii': 'Totul pentru copii',
+  'fotografie': 'Fotografie',
+  'muzica': 'Instrumente muzicale',
+  'carti': 'Cărți și reviste',
+  'accesorii_animale': 'Accesorii pentru animale de companie',
+  'vinil': 'Muzică și film',
+  'real-estate': 'Case și apartamente',
+  'jobs': 'Locuri de muncă'
 };
 
 export default function HomePage() {
@@ -40,27 +95,162 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [userListings, setUserListings] = useState<Listing[]>([]);
+  const [realListings, setRealListings] = useState<AdListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Load favorites & user-published listings from localStorage on mount
+  // Load favorites, active tab & real listings from Firestore + localStorage + sessionStorage on mount
   useEffect(() => {
     try {
       const savedFavs = localStorage.getItem('monky_favorites');
       if (savedFavs) {
         setFavorites(JSON.parse(savedFavs));
       }
-      const savedUserAds = localStorage.getItem('monky_user_listings');
-      if (savedUserAds) {
-        setUserListings(JSON.parse(savedUserAds));
+    } catch (e) {
+      console.error(e);
+    }
+
+    try {
+      const savedTab = localStorage.getItem('monky_active_tab');
+      if (savedTab) {
+        setActiveTab(savedTab);
       }
     } catch (e) {
       console.error(e);
     }
+
+    const loadAds = async () => {
+      let userAds: AdListing[] = [];
+      let deletedIds: string[] = [];
+
+      try {
+        const savedDeleted = localStorage.getItem('monky_deleted_listings');
+        if (savedDeleted) {
+          deletedIds = JSON.parse(savedDeleted);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      try {
+        const savedUserAds = localStorage.getItem('monky_user_listings');
+        if (savedUserAds) {
+          userAds = (JSON.parse(savedUserAds) as AdListing[]).filter(
+            (item) => !deletedIds.includes(item.id)
+          );
+        }
+      } catch (e) {
+        console.error('Eroare la citirea user listings:', e);
+      }
+
+      try {
+        const firestoreAds = await getListings(true);
+        const firestoreIds = new Set(firestoreAds.map((ad) => ad.id));
+
+        // Reconcile userAds: purge any ads that were deleted from Firestore
+        const validUserAds = userAds.filter((ad) => {
+          if (deletedIds.includes(ad.id)) return false;
+          // If it had a database ID and is no longer in Firestore, it was deleted in admin/db!
+          if (!firestoreIds.has(ad.id) && !ad.id.startsWith('local-')) {
+            return false;
+          }
+          return true;
+        });
+
+        // Clean ghost ads from localStorage permanently
+        if (validUserAds.length !== userAds.length) {
+          localStorage.setItem('monky_user_listings', JSON.stringify(validUserAds));
+        }
+
+        const combined = [...firestoreAds];
+        validUserAds.forEach((ad) => {
+          if (!deletedIds.includes(ad.id) && !combined.some((item) => item.id === ad.id)) {
+            combined.unshift(ad);
+          }
+        });
+        setRealListings(combined);
+      } catch (err) {
+        console.error('Eroare la încărcarea anunțurilor:', err);
+        setRealListings(userAds);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAds();
+
+    const handleListingDeleted = (e: any) => {
+      const deletedId = e?.detail?.id;
+      if (deletedId) {
+        setRealListings((prev) => prev.filter((item) => item.id !== deletedId));
+      } else {
+        loadAds();
+      }
+    };
+
+    window.addEventListener('monky_listing_deleted', handleListingDeleted);
+    window.addEventListener('storage', loadAds);
+
+    return () => {
+      window.removeEventListener('monky_listing_deleted', handleListingDeleted);
+      window.removeEventListener('storage', loadAds);
+    };
   }, []);
 
-  const allListings = useMemo(() => {
-    return [...userListings, ...MOCK_LISTINGS];
-  }, [userListings]);
+  // Restore scroll position to last viewed ad card when returning from details page
+  useEffect(() => {
+    if (!loading) {
+      try {
+        const lastId = sessionStorage.getItem('lastViewedAdId');
+        if (lastId) {
+          sessionStorage.removeItem('lastViewedAdId');
+          setTimeout(() => {
+            const el = document.getElementById(`ad-card-${lastId}`);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }, 300);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, [loading]);
+
+  const [visibleCount, setVisibleCount] = useState(12);
+  const [showStickyHeader, setShowStickyHeader] = useState(false);
+
+  // Scroll listener to toggle floating sticky search header when scrolling past main search box
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 30) {
+        setShowStickyHeader(true);
+      } else {
+        setShowStickyHeader(false);
+      }
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Reset visible count when active tab or filters change
+  useEffect(() => {
+    setVisibleCount(12);
+  }, [activeTab, selectedType, selectedBrand, selectedModel, selectedCategory, searchQuery, locationInput, selectedPrice]);
+
+  const handleTabChange = (newTab: string) => {
+    setActiveTab(newTab);
+    setSelectedType('Orice');
+    setSelectedBrand('Orice');
+    setSelectedModel('Orice');
+    setSelectedCategory(null);
+    setVisibleCount(12);
+    try {
+      localStorage.setItem('monky_active_tab', newTab);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const toggleFavorite = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -78,9 +268,12 @@ export default function HomePage() {
     }
   };
 
-  // Sync category exploration selection with selectedType dropdown
-  const handleSelectCategory = (catId: string | null) => {
+  // Sync category exploration selection with selectedType dropdown and activeTab
+  const handleSelectCategory = (catId: string | null, mainTab?: string) => {
     setSelectedCategory(catId);
+    if (mainTab && mainTab !== activeTab) {
+      setActiveTab(mainTab);
+    }
     if (catId && CAT_TO_TYPE_MAP[catId]) {
       setSelectedType(CAT_TO_TYPE_MAP[catId]);
     } else {
@@ -119,40 +312,21 @@ export default function HomePage() {
 
   // Filter listings based on all active criteria
   const filteredListings = useMemo(() => {
-    return MOCK_LISTINGS.filter((item) => {
-      // Keyword search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase().trim();
-        const matchTitle = item.title.toLowerCase().includes(q);
-        const matchDesc = item.description.toLowerCase().includes(q);
-        const matchBrand = item.brand?.toLowerCase().includes(q);
-        const matchModel = item.model?.toLowerCase().includes(q);
-        const matchLoc = item.location.toLowerCase().includes(q);
-        const matchSeller = item.seller?.name.toLowerCase().includes(q);
-        const matchCat = item.category.toLowerCase().includes(q);
-        if (
-          !matchTitle &&
-          !matchDesc &&
-          !matchBrand &&
-          !matchModel &&
-          !matchLoc &&
-          !matchSeller &&
-          !matchCat
-        ) {
-          return false;
-        }
-      }
+    let base = realListings.filter((item) => {
+      // ONLY SHOW CARS on the main page as requested: "en pagina principal que aparescan solo coches"
+      const isCar = isCategoryMatch(item.category, 'coches');
+      if (!isCar) return false;
 
       // Type / Category dropdown
       if (selectedType !== 'Orice') {
-        const targetCategory = TYPE_TO_CAT_MAP[selectedType];
-        if (targetCategory && item.category !== targetCategory) {
+        const targetCategory = TYPE_TO_CAT_MAP[selectedType] || selectedType;
+        if (!isCategoryMatch(item.category, targetCategory)) {
           return false;
         }
       }
 
       // Category card filter
-      if (selectedCategory && item.category !== selectedCategory) {
+      if (selectedCategory && !isCategoryMatch(item.category, selectedCategory)) {
         return false;
       }
 
@@ -180,15 +354,45 @@ export default function HomePage() {
         locationInput !== 'Toată România' &&
         locationInput !== 'Tutta Italia'
       ) {
-        const loc = locationInput.toLowerCase().trim();
-        if (!item.location.toLowerCase().includes(loc)) {
+        const locNorm = normalizeText(locationInput);
+        if (!normalizeText(item.location).includes(locNorm)) {
           return false;
         }
       }
 
       return true;
     });
+
+    // Smart Keyword Search (Diacritic-insensitive, Title/Brand/Model priority)
+    if (searchQuery.trim()) {
+      const queryNorm = normalizeText(searchQuery);
+      const keywords = queryNorm.split(/\s+/).filter(Boolean);
+
+      const titleMatches = base.filter((item) => {
+        const titleNorm = normalizeText(item.title);
+        const brandNorm = normalizeText(item.brand || '');
+        const modelNorm = normalizeText(item.model || '');
+
+        return keywords.every(
+          (kw) => titleNorm.includes(kw) || brandNorm.includes(kw) || modelNorm.includes(kw)
+        );
+      });
+
+      if (titleMatches.length > 0) {
+        base = titleMatches;
+      } else {
+        base = base.filter((item) => {
+          const descNorm = normalizeText(item.description);
+          const titleNorm = normalizeText(item.title);
+          return keywords.every((kw) => titleNorm.includes(kw) || descNorm.includes(kw));
+        });
+      }
+    }
+
+    return base;
   }, [
+    realListings,
+    activeTab,
     searchQuery,
     selectedType,
     selectedCategory,
@@ -254,21 +458,30 @@ export default function HomePage() {
     setSearchQuery(query);
   };
 
-  const displayCount = hasActiveFilters
-    ? filteredListings.length
-    : filteredListings.length * 3500 + 420;
+  const displayCount = filteredListings.length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <Navbar favoriteCount={favorites.length} onResetSearch={handleResetFilters} />
+    <div className="min-h-screen flex flex-col bg-[#f4f7f8] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <Navbar
+        favoriteCount={favorites.length}
+        onResetSearch={handleResetFilters}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        activeTab={activeTab}
+        selectedType={selectedType}
+        setSelectedType={handleTypeChange}
+        locationInput={locationInput}
+        setLocationInput={setLocationInput}
+        showCompactSearch={showStickyHeader}
+      />
 
       <main className="main-container flex-grow">
-        {/* Upper Search Card */}
+        {/* Upper Search Bar */}
         <SearchFilterBox
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
+          setActiveTab={handleTabChange}
           selectedType={selectedType}
           setSelectedType={handleTypeChange}
           selectedBrand={selectedBrand}
@@ -288,16 +501,51 @@ export default function HomePage() {
         <CategoryExplore
           selectedCategory={selectedCategory}
           onSelectCategory={handleSelectCategory}
+          activeTab={activeTab}
         />
 
-        {/* Recommended Items Grid */}
-        <ListingGrid
-          listings={filteredListings}
-          favorites={favorites}
-          onToggleFavorite={toggleFavorite}
-          activeFilterChips={activeFilterChips}
-          onResetFilters={handleResetFilters}
-        />
+        {/* Recent Listings Slider (Anunțuri noi) like in the app */}
+        {!loading && realListings.length > 0 && (
+          <RecentListingsSlider
+            listings={realListings as any}
+            favorites={favorites}
+            onToggleFavorite={toggleFavorite}
+          />
+        )}
+
+        {/* Container Section Underneath Categories */}
+        <section className="w-full bg-[#F2F3F6] dark:bg-[#1a222d] rounded-2xl sm:rounded-3xl p-3 sm:p-4 md:p-5 border border-slate-200/80 dark:border-[#2d3b49] shadow-xs my-6">
+          {loading ? (
+            <div className="flex justify-center items-center py-24">
+              <p className="text-slate-500 font-semibold animate-pulse">Se încarcă anunțurile...</p>
+            </div>
+          ) : (
+            <>
+              <ListingGrid
+                title="Autoturisme recomandate"
+                listings={filteredListings.slice(0, visibleCount) as any}
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                activeFilterChips={activeFilterChips}
+                onResetFilters={handleResetFilters}
+                showPriceOnImage={false}
+                maxColumns={4}
+              />
+
+              {filteredListings.length > visibleCount && (
+                <div className="flex justify-center my-6">
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((prev) => prev + 12)}
+                    className="bg-[#38d39f] hover:bg-[#31c794] active:scale-95 text-[#18222d] text-sm font-extrabold px-7 py-2.5 rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none"
+                  >
+                    Încarcă mai multe
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </section>
 
         {/* Suggested Searches Carousel */}
         <SuggestedSearches onSelectSuggestedSearch={handleSelectSuggestedSearch} />

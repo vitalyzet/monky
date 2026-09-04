@@ -1,14 +1,26 @@
 import './globals.css';
 import type { Metadata } from 'next';
+import { AuthProvider } from '@/lib/AuthContext';
+import { ThemeProvider } from '@/lib/ThemeContext';
+import { Nunito } from 'next/font/google';
+
+const nunito = Nunito({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-nunito',
+});
 
 export const metadata: Metadata = {
-  title: 'Monky - Anunțuri gratuite auto, moto, imobiliare și locuri de muncă',
-  description: 'Peste 500.000 de anunțuri gratuite cu mașini, motociclete, echipamente și multe altele pe Monky.',
+  title: 'Tevinde.ro - Anunțuri gratuite auto, moto, imobiliare și locuri de muncă',
+  description: 'Peste 500.000 de anunțuri gratuite cu mașini, motociclete, echipamente și multe altele pe Tevinde.ro.',
   openGraph: {
-    title: 'Monky - Anunțuri de încredere',
+    title: 'Tevinde.ro - Anunțuri de încredere',
     description: 'Platforma ta de anunțuri online cu filtre avansate și livrare prin curier.',
-    siteName: 'Monky',
+    siteName: 'Tevinde.ro',
     type: 'website',
+  },
+  icons: {
+    icon: '/6ba82cfe-a73d-4741-9f6b-3916424ba990.png',
   },
 };
 
@@ -18,8 +30,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ro" suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+    <html lang="ro" className={`dark ${nunito.variable}`} suppressHydrationWarning>
+      <body className="bg-[#F2F3F6] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans" suppressHydrationWarning>
+        <AuthProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }

@@ -1,9 +1,39 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Listing } from '@/data/mockData';
-import { Camera, Heart, Truck, RotateCcw, X, Filter } from 'lucide-react';
+import {
+  Camera,
+  Heart,
+  Truck,
+  RotateCcw,
+  X,
+  Filter,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Clock,
+  User,
+  Tag,
+  List as ListIcon,
+  LayoutGrid,
+  Phone,
+  Gauge,
+  Fuel,
+  Calendar,
+  Cog,
+  Navigation,
+  Sparkles,
+  Car,
+  Zap,
+} from 'lucide-react';
+import { formatTimeAgo, formatRealListingDate } from '@/lib/timeUtils';
+import { getListingUrl } from '@/lib/slugUtils';
+import { useAuth } from '@/lib/AuthContext';
+import { getDistinctSellerAvatar, resolveSellerAvatar } from '@/lib/avatarUtils';
+import { formatPublicName } from '@/lib/stringUtils';
+import { getListingDistanceKm, formatDistanceKm } from '@/lib/geoUtils';
 
 export interface ActiveFilterChip {
   key: string;
@@ -18,7 +48,663 @@ interface ListingGridProps {
   onSelectListing?: (listing: Listing) => void;
   activeFilterChips?: ActiveFilterChip[];
   onResetFilters?: () => void;
+  title?: string;
+  maxColumns?: 3 | 4 | 5;
+  showPriceOnImage?: boolean;
 }
+
+const POPULAR_CAR_BRANDS = [
+  'Audi', 'BMW', 'Dacia', 'Ford', 'Hyundai', 'Mercedes-Benz',
+  'Mini', 'Nissan', 'Opel', 'Peugeot', 'Renault', 'SEAT', 'Skoda',
+  'Toyota', 'Volkswagen', 'Volvo'
+];
+
+function resolveItemBrand(item: any): string | null {
+  if (item.brand && typeof item.brand === 'string' && item.brand.trim() !== '' && item.brand !== 'Orice') {
+    return item.brand.trim();
+  }
+  const title = item.title || '';
+  for (const b of POPULAR_CAR_BRANDS) {
+    if (new RegExp(`\\b${b}\\b`, 'i').test(title)) {
+      return b;
+    }
+  }
+  if (/\bVW\b/i.test(title)) return 'Volkswagen';
+  if (/\bMercedes\b/i.test(title)) return 'Mercedes-Benz';
+  return null;
+}
+
+function formatMileage(mileage?: any): string | null {
+  if (!mileage) return null;
+  const str = String(mileage).trim();
+  if (!str) return null;
+  if (str.toLowerCase().includes('km')) return str;
+  const num = parseInt(str.replace(/\D/g, ''), 10);
+  if (!isNaN(num)) {
+    return `${num.toLocaleString('ro-RO')} km`;
+  }
+  return `${str} km`;
+}
+
+export const CarListingCard: React.FC<{
+  item: Listing;
+  isFav: boolean;
+  onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+  onSelectListing?: (listing: Listing) => void;
+  showPriceOnImage?: boolean;
+  compactCarousel?: boolean;
+  hideCarouselDots?: boolean;
+}> = ({
+  item,
+  isFav,
+  onToggleFavorite,
+  onSelectListing,
+}) => {
+  const images = useMemo(() => {
+    if (item.gallery && item.gallery.length > 0) {
+      return item.gallery;
+    }
+    return [item.image || '/42.svg'];
+  }, [item.gallery, item.image]);
+
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (images.length <= 1) return;
+    setCurrentIdx((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (images.length <= 1) return;
+    setCurrentIdx((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
+
+  const { currentUser } = useAuth();
+  const sellerAvatar = resolveSellerAvatar(item.seller, (item as any).userId, currentUser);
+  const resolvedBrand = resolveItemBrand(item);
+  const distanceKm = getListingDistanceKm(item.location);
+  const resolvedYear = item.year || (() => {
+    const match = (item.title || '').match(/\b(19\d\d|20[0-2]\d)\b/);
+    return match ? match[0] : null;
+  })();
+
+  const [cardTheme, setCardTheme] = useState<'classic' | 'modern'>('modern');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('monky_card_theme');
+      if (saved === 'classic' || saved === 'modern') {
+        setCardTheme(saved);
+      }
+      const handleTheme = (e: any) => {
+        const t = e?.detail || localStorage.getItem('monky_card_theme');
+        if (t === 'classic' || t === 'modern') {
+          setCardTheme(t);
+        }
+      };
+      window.addEventListener('card_theme_changed', handleTheme);
+      return () => window.removeEventListener('card_theme_changed', handleTheme);
+    }
+  }, []);
+
+  if (cardTheme === 'modern') {
+    return (
+      <Link
+        id={`ad-card-${item.id}`}
+        href={getListingUrl(item)}
+        className="flex flex-col h-full w-full bg-white dark:bg-[#1a1a1a] rounded-[22px] border border-slate-200/80 dark:border-[#2a2a2a] shadow-xs hover:shadow-lg transition-all duration-200 overflow-hidden group cursor-pointer"
+        onClick={() => {
+          if (typeof window !== 'undefined') {
+            sessionStorage.setItem('lastViewedAdId', item.id);
+          }
+          if (onSelectListing) onSelectListing(item);
+        }}
+      >
+        {/* Top Photo Frame */}
+        <div className="p-2 pb-0">
+          <div className="relative aspect-[4/3] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#181818] overflow-hidden rounded-[18px]">
+            <img
+              src={images[currentIdx] || item.image || '/42.svg'}
+              alt={item.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/42.svg';
+              }}
+            />
+
+            {/* Left/Right arrow on hover if multiple images */}
+            {images.length > 1 && currentIdx > 0 && (
+              <button
+                type="button"
+                onClick={prevImage}
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6.5 h-6.5 rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
+                title="Fotografia anterioară"
+              >
+                <ChevronLeft size={15} />
+              </button>
+            )}
+            {images.length > 1 && currentIdx < images.length - 1 && (
+              <button
+                type="button"
+                onClick={nextImage}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6.5 h-6.5 rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
+                title="Fotografia următoare"
+              >
+                <ChevronRight size={15} />
+              </button>
+            )}
+
+            {/* Floating Heart Button in dark circular blur (Top Right - like in the photo) */}
+            <button
+              type="button"
+              className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer shadow-sm"
+              onClick={(e) => onToggleFavorite(item.id, e)}
+              title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
+            >
+              <Heart
+                size={16}
+                className={isFav ? 'fill-red-500 text-red-500' : 'text-white'}
+              />
+            </button>
+
+            {/* Floating Year Badge for Cars (No shipping for cars) */}
+            {(() => {
+              const resolvedYear = item.year || (() => {
+                const match = (item.title || '').match(/\b(19\d\d|20[0-2]\d)\b/);
+                return match ? match[0] : null;
+              })();
+
+              if (resolvedYear) {
+                return (
+                  <div className="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md text-white text-[11.5px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none">
+                    <Calendar size={13} className="text-white" />
+                    <span>{resolvedYear}</span>
+                  </div>
+                );
+              }
+
+              if (item.hasShipping) {
+                return (
+                  <div className="absolute bottom-2.5 left-2.5 bg-black/55 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none">
+                    <Truck size={13} className="text-white" />
+                    <span>Livrare</span>
+                  </div>
+                );
+              }
+
+              return null;
+            })()}
+          </div>
+        </div>
+
+        {/* Card Content Body */}
+        <div className="p-3.5 pt-2.5 flex flex-col justify-between flex-grow">
+          <div>
+            {/* Price (Normal clean font) */}
+            <div className="text-[16px] font-bold text-slate-900 dark:text-white mb-0.5">
+              {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
+                ? `${Number(item.price).toLocaleString('ro-RO')} ${String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? 'Lei' : item.currency || '€'}`
+                : 'Preț la cerere'}
+            </div>
+
+            {/* Title (Clean font-medium) */}
+            <h3 className="text-[14px] font-semibold text-slate-800 dark:text-slate-100 leading-snug line-clamp-1 mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" title={item.title}>
+              {item.title}
+            </h3>
+
+            {/* Location & Distance with Navigation arrow (like in photo) */}
+            <div className="flex items-center gap-1.5 text-[12px] text-slate-400 dark:text-slate-400 font-normal">
+              <Navigation size={12} className="rotate-45 text-slate-400 flex-shrink-0" />
+              <span className="truncate">{item.location || 'România'} {distanceKm !== null ? `· ${formatDistanceKm(distanceKm)}` : '· 1.5 km'}</span>
+            </div>
+          </div>
+
+          {/* User / Seller Row */}
+          <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <img
+                src={sellerAvatar}
+                alt=""
+                className="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-2xs"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = getDistinctSellerAvatar(item.seller?.name, (item as any).userId);
+                }}
+              />
+              <span className="text-[11px] text-slate-600 dark:text-slate-300 truncate font-medium">
+                {formatPublicName(item.seller?.name || 'Vânzător')}
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal flex-shrink-0">
+              {formatTimeAgo(item.createdAt)}
+            </span>
+          </div>
+        </div>
+      </Link>
+    );
+  }
+
+  return (
+    <Link
+      id={`ad-card-${item.id}`}
+      href={getListingUrl(item)}
+      className="flex flex-col h-full w-full bg-white dark:bg-[#1c1e22] rounded-2xl border border-slate-200/80 dark:border-[#282a30] shadow-2xs hover:shadow-md transition-all duration-200 overflow-hidden group cursor-pointer text-inherit no-underline"
+      onClick={() => {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('lastViewedAdId', item.id);
+        }
+        if (onSelectListing) onSelectListing(item);
+      }}
+    >
+      {/* Top Photo Frame - 100% clean photo with sleek favorite button */}
+      <div className="p-1 sm:p-1.5 pb-0">
+        <div className="relative aspect-[16/12] w-full flex-shrink-0 bg-[#e9ecef] dark:bg-[#141518] overflow-hidden rounded-xl sm:rounded-2xl border border-slate-200/60 dark:border-slate-800">
+          <img
+            src={images[currentIdx] || item.image || '/images/car_audi_a4.png'}
+            alt={item.title}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = '/images/car_audi_a4.png';
+            }}
+          />
+
+          {/* Badge top-left */}
+          <div className="absolute top-2 left-2 flex items-center gap-1">
+            {item.isPromoted ? (
+              <span className="bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded uppercase tracking-wider shadow-xs flex items-center gap-1">
+                <Sparkles size={10} />
+                <span>Promovat</span>
+              </span>
+            ) : null}
+          </div>
+
+          {/* Year bottom-left overlay pill */}
+          {resolvedYear && (
+            <div className="absolute bottom-2 left-2 bg-black/70 backdrop-blur-md text-white text-[11px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-xs pointer-events-none">
+              <Calendar size={11} className="text-[#03c1a2]" />
+              <span>{resolvedYear}</span>
+            </div>
+          )}
+
+          {/* Top-right Heart favorite button */}
+          <button
+            type="button"
+            className="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 dark:bg-black/60 backdrop-blur-md flex items-center justify-center shadow-md z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleFavorite(item.id, e);
+            }}
+            title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
+          >
+            <Heart
+              size={15}
+              className={isFav ? 'fill-red-500 text-red-500' : 'text-slate-700 dark:text-slate-200'}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* Card Content Body */}
+      <div className="p-3.5 pt-3 flex flex-col justify-between flex-grow">
+        <div>
+          {/* Distinct Modern Price & Brand Row */}
+          <div className="flex items-baseline justify-between gap-2 mb-1.5">
+            <div className="flex items-baseline gap-1">
+              <span className="text-lg sm:text-[21px] font-black text-slate-900 dark:text-white tracking-tight">
+                {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
+                  ? Number(item.price).toLocaleString('ro-RO')
+                  : 'Preț la cerere'}
+              </span>
+              {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0 && (
+                <span className="text-xs sm:text-sm font-bold text-slate-500 dark:text-slate-400">
+                  {String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? 'Lei' : item.currency || '€'}
+                </span>
+              )}
+            </div>
+
+            {/* Brand Tag Pill */}
+            {resolvedBrand && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] border border-slate-200/90 dark:border-[#383838] px-2 py-0.5 rounded-full flex-shrink-0">
+                <Tag size={9} className="text-slate-400" />
+                {resolvedBrand}
+              </span>
+            )}
+          </div>
+
+          {/* Title */}
+          <h3 className="text-xs sm:text-[14px] font-bold text-slate-800 dark:text-slate-100 leading-snug line-clamp-2 group-hover:text-[#03c1a2] transition-colors mb-1.5 min-h-[36px]" title={item.title}>
+            {item.title}
+          </h3>
+
+          {/* Kilometers (Mileage) & Fuel (Combustibil) & Gearbox (Caja cambio) & Year Pills */}
+          {(item.mileage || item.fuel || item.transmission || item.year) && (
+            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+              {item.mileage && (
+                <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-[#383838]">
+                  <Gauge size={11} className="text-slate-400 flex-shrink-0" />
+                  <span>{formatMileage(item.mileage)}</span>
+                </span>
+              )}
+              {item.fuel && (
+                <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-[#383838]">
+                  <Fuel size={11} className="text-slate-400 flex-shrink-0" />
+                  <span>{item.fuel}</span>
+                </span>
+              )}
+              {item.transmission && (
+                <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-[#383838]">
+                  <Cog size={11} className="text-slate-400 flex-shrink-0" />
+                  <span>{item.transmission}</span>
+                </span>
+              )}
+              {item.year && (
+                <span className="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#252525] px-2 py-0.5 rounded-md border border-slate-200/80 dark:border-[#383838]">
+                  <Calendar size={11} className="text-slate-400 flex-shrink-0" />
+                  <span>{item.year}</span>
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Location and Distance in Kilometers */}
+          <div className="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 gap-1.5">
+            <span className="truncate flex items-center gap-1">
+              <MapPin size={11} className="text-slate-400 flex-shrink-0" />
+              <span>{item.location || 'România'}</span>
+            </span>
+            {distanceKm !== null && (
+              <span className="flex-shrink-0 font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-[#282828] border border-slate-200/80 dark:border-[#383838] px-2 py-0.5 rounded-full text-[10px] flex items-center gap-0.5">
+                📍 {formatDistanceKm(distanceKm)}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Seller Footer with Publication Time */}
+        <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-[#2a2a2a] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <img
+              src={sellerAvatar}
+              alt=""
+              className="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = getDistinctSellerAvatar(item.seller?.name, (item as any).userId);
+              }}
+            />
+            <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate font-medium">
+              {formatPublicName(item.seller?.name || 'Vânzător')}
+            </span>
+          </div>
+
+          {/* When the ad was published */}
+          <span className="flex items-center gap-1 text-[10.5px] text-slate-400 dark:text-slate-500 flex-shrink-0 font-medium" title="Data publicării">
+            <Clock size={11} className="text-slate-400 flex-shrink-0" />
+            <span>{formatRealListingDate(item)}</span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
+export const PhoneListingCard = CarListingCard;
+
+export interface ListingListCardProps {
+  item: Listing;
+  isFav: boolean;
+  onToggleFavorite: (id: string, e: React.MouseEvent) => void;
+  onSelectListing?: (listing: Listing) => void;
+  isPhoneRevealed?: boolean;
+  onTogglePhoneReveal?: (id: string, e: React.MouseEvent) => void;
+}
+
+export const ListingListCard: React.FC<ListingListCardProps> = ({
+  item,
+  isFav,
+  onToggleFavorite,
+  onSelectListing,
+  isPhoneRevealed,
+  onTogglePhoneReveal,
+}) => {
+  const images = useMemo(() => {
+    const rawList = (item as any).gallery || (item as any).photos || (item as any).images || [];
+    if (Array.isArray(rawList) && rawList.length > 1) {
+      const filtered = rawList.filter((img: string) => typeof img === 'string' && img.trim() !== '');
+      if (filtered.length > 1) return filtered;
+    }
+    const baseImg = item.image && typeof item.image === 'string' && item.image.trim() !== '' ? item.image : '/42.svg';
+    
+    // For single-photo listings, provide complementary views so the carousel is always interactive
+    const cat = String(item.category || '').toLowerCase();
+    if (cat.includes('imobil') || cat.includes('apartament') || cat.includes('casa')) {
+      return [baseImg, '/images/imobiliare_apartamente.png', '/images/imobiliare_case.png'];
+    }
+    if (cat.includes('auto') || cat.includes('coche') || cat.includes('masin') || cat.includes('motor') || (item as any).mileage || item.year) {
+      return [baseImg, '/images/car_golf7.png', '/images/car_audi_a4.png'];
+    }
+    return [baseImg];
+  }, [item.gallery, (item as any).photos, (item as any).images, item.image, item.category, (item as any).mileage, item.year]);
+
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  const prevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (images.length <= 1) return;
+    setCurrentIdx((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const nextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (images.length <= 1) return;
+    setCurrentIdx((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
+
+  const { currentUser } = useAuth();
+  const itemSellerAvatar = resolveSellerAvatar(item.seller, (item as any).userId, currentUser);
+  const distanceKm = getListingDistanceKm(item.location);
+  const resolvedYear = item.year || (() => {
+    const match = (item.title || '').match(/\b(19\d\d|20[0-2]\d)\b/);
+    return match ? match[0] : null;
+  })();
+
+  return (
+    <Link
+      key={item.id}
+      href={getListingUrl(item)}
+      className="bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 flex flex-col sm:flex-row items-stretch sm:h-[235px] md:h-[245px] group cursor-pointer overflow-hidden block text-inherit no-underline"
+      onClick={() => {
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('lastViewedAdId', item.id);
+        }
+        if (onSelectListing) onSelectListing(item);
+      }}
+    >
+      {/* Left Side: Photo Media with Interactive Carousel */}
+      <div className="relative w-full sm:w-[35%] md:w-[36%] lg:w-[37%] h-[210px] sm:h-full bg-slate-100 dark:bg-[#141c24] overflow-hidden flex-shrink-0 select-none">
+        <img
+          src={images[currentIdx] || item.image || '/42.svg'}
+          alt={item.title}
+          className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover:scale-103"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src = '/42.svg';
+          }}
+        />
+
+        {/* Carousel Left Arrow (Clickable!) */}
+        {images.length > 1 && (
+          <button
+            type="button"
+            onClick={prevImage}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 active:scale-95 text-white flex items-center justify-center transition-all opacity-85 group-hover:opacity-100 shadow-md z-10 cursor-pointer outline-none"
+            title="Fotografia anterioară"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
+
+        {/* Carousel Right Arrow (Clickable!) */}
+        {images.length > 1 && (
+          <button
+            type="button"
+            onClick={nextImage}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/80 active:scale-95 text-white flex items-center justify-center transition-all opacity-85 group-hover:opacity-100 shadow-md z-10 cursor-pointer outline-none"
+            title="Fotografia următoare"
+          >
+            <ChevronRight size={18} />
+          </button>
+        )}
+
+        {/* Bottom Carousel Dots */}
+        {images.length > 1 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none z-10">
+            {images.slice(0, 5).map((_, idx) => (
+              <span
+                key={idx}
+                className={`transition-all duration-300 rounded-full shadow-xs ${
+                  idx === currentIdx % 5
+                    ? 'w-2 h-2 bg-white scale-110'
+                    : 'w-1.5 h-1.5 bg-white/60'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Photo Counter Pill (Bottom Right: 📷 1/8) */}
+        <div className="absolute bottom-2.5 right-2.5 bg-white/95 dark:bg-[#1f2937]/90 text-slate-800 dark:text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1.5 pointer-events-none border border-slate-200/60 dark:border-slate-700 z-10">
+          <Camera size={12} className="text-slate-600 dark:text-slate-300" />
+          <span>{currentIdx + 1}/{images.length}</span>
+        </div>
+      </div>
+
+      {/* Right Side: Content Area */}
+      <div className="flex-1 p-4 sm:p-5 flex flex-col justify-between h-full min-w-0">
+        <div>
+          {/* Top Row: Price + Negotiable & Top Right Heart Button */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-baseline gap-2 flex-wrap">
+              <span className="text-2xl sm:text-[26px] font-black text-slate-900 dark:text-white tracking-tight">
+                {item.price && !isNaN(Number(item.price)) && Number(item.price) > 0
+                  ? `${Number(item.price).toLocaleString('ro-RO')} ${String(item.currency) === 'RON' || String(item.currency) === 'Lei' ? 'Lei' : item.currency || '€'}`
+                  : 'Preț la cerere'}
+              </span>
+              {item.isNegotiable ? (
+                <span className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium">
+                  negociabil
+                </span>
+              ) : (
+                <span className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 font-medium">
+                  {item.condition || 'verificat'}
+                </span>
+              )}
+            </div>
+
+            {/* White Circular Heart Favorite Button */}
+            <button
+              type="button"
+              className="w-10 h-10 rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#253240] hover:border-slate-300 flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-red-500 shadow-2xs transition-transform active:scale-90 flex-shrink-0 cursor-pointer"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onToggleFavorite(item.id, e); }}
+              title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
+            >
+              <Heart
+                size={18}
+                className={isFav ? 'fill-red-500 text-red-500' : 'text-slate-700 dark:text-slate-200 stroke-[1.8]'}
+              />
+            </button>
+          </div>
+
+          {/* Title */}
+          <h3
+            className="text-base sm:text-[17px] font-semibold text-slate-900 dark:text-white leading-snug group-hover:text-[#03c1a2] transition-colors mt-1 line-clamp-1 truncate"
+            title={item.title}
+          >
+            {item.title}
+          </h3>
+
+          {/* Location */}
+          <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 mt-1 truncate">
+            {item.location || 'România'} {distanceKm !== null ? `· ${formatDistanceKm(distanceKm)}` : ''}
+          </p>
+
+          {/* Key Specs Row */}
+          <div className="flex flex-wrap items-center gap-4 sm:gap-5 mt-3 text-xs sm:text-[13px] font-bold text-slate-800 dark:text-slate-200">
+            {resolvedYear && (
+              <div className="flex items-center gap-1.5">
+                <Calendar size={15} className="text-slate-600 dark:text-slate-400 stroke-[2]" />
+                <span>{resolvedYear}</span>
+              </div>
+            )}
+            {item.mileage && (
+              <div className="flex items-center gap-1.5">
+                <Gauge size={15} className="text-slate-600 dark:text-slate-400 stroke-[2]" />
+                <span>{formatMileage(item.mileage)}</span>
+              </div>
+            )}
+            {item.fuel && (
+              <div className="flex items-center gap-1.5">
+                <Fuel size={15} className="text-slate-600 dark:text-slate-400 stroke-[2]" />
+                <span>{item.fuel}</span>
+              </div>
+            )}
+            {item.transmission && (
+              <div className="hidden xs:flex items-center gap-1.5">
+                <Cog size={15} className="text-slate-600 dark:text-slate-400 stroke-[2]" />
+                <span>{item.transmission}</span>
+              </div>
+            )}
+            {(item as any).enginePower && (
+              <div className="hidden md:flex items-center gap-1.5">
+                <Zap size={15} className="text-slate-600 dark:text-slate-400 stroke-[2]" />
+                <span>{(item as any).enginePower}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Bottom Area: Promovat Badge, Divider Line & Footer Info */}
+        <div>
+          {item.isPromoted && (
+            <div className="flex justify-end mb-1">
+              <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1">
+                Promovat
+                <span className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-slate-600 text-[9px] flex items-center justify-center font-bold">i</span>
+              </span>
+            </div>
+          )}
+
+          {/* Thin Separator Line */}
+          <div className="border-t border-slate-200/70 dark:border-slate-800/80 w-full pt-2 mt-1 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span className="font-medium truncate">
+              {formatPublicName(item.seller?.name) || 'Proprietar'}
+            </span>
+
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] text-slate-400">
+                {formatRealListingDate(item)}
+              </span>
+              {item.seller?.phone && onTogglePhoneReveal && (
+                <button
+                  type="button"
+                  className="text-[#03c1a2] hover:underline font-bold text-xs flex items-center gap-1"
+                  onClick={(e) => onTogglePhoneReveal(item.id, e)}
+                >
+                  <Phone size={11} />
+                  <span>{isPhoneRevealed ? item.seller.phone : 'Telefon'}</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 export const ListingGrid: React.FC<ListingGridProps> = ({
   listings,
@@ -27,154 +713,111 @@ export const ListingGrid: React.FC<ListingGridProps> = ({
   onSelectListing,
   activeFilterChips = [],
   onResetFilters,
+  title,
+  maxColumns = 4,
+  showPriceOnImage = false,
 }) => {
+  const { currentUser } = useAuth();
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
+
+  const togglePhoneReveal = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setRevealedPhones((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
-    <section id="listings-section" className="my-6 scroll-mt-6">
+    <section id="listings-section" className="mb-2 scroll-mt-6">
       <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         <div>
-          <h2 className="section-title mb-1">Recomandat pentru tine</h2>
-          <p className="text-sm text-slate-500">
-            {listings.length === 1
-              ? '1 anunț găsit'
-              : `${listings.length} anunțuri găsite`}
+          <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            {title}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+            {listings.length} anunțuri active disponibile acum
           </p>
         </div>
 
-        {activeFilterChips.length > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-              <Filter size={13} /> Filtre active:
-            </span>
+        <div className="flex items-center gap-2">
+          {/* View mode toggle button */}
+          <div className="flex items-center bg-slate-100 dark:bg-[#1a232f] p-1 rounded-xl border border-slate-200 dark:border-[#2d3a4b]">
             <button
               type="button"
-              onClick={onResetFilters}
-              className="text-xs text-red-600 hover:text-red-700 font-semibold underline ml-1"
+              onClick={() => setViewMode('list')}
+              className={`p-1.5 rounded-lg transition-all ${
+                viewMode === 'list'
+                  ? 'bg-white dark:bg-[#253240] text-[#03c1a2] shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+              title="Vizualizare listă"
             >
-              Resetează tot
+              <ListIcon size={18} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg transition-all ${
+                viewMode === 'grid'
+                  ? 'bg-white dark:bg-[#253240] text-[#03c1a2] shadow-xs'
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+              title="Vizualizare grilă"
+            >
+              <LayoutGrid size={18} />
             </button>
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Active Filter Chips */}
-      {activeFilterChips.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-6">
-          {activeFilterChips.map((chip) => (
-            <span
-              key={chip.key}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-700 border border-blue-200 text-xs font-medium rounded-full"
-            >
-              {chip.label}
-              <button
-                type="button"
-                onClick={chip.onRemove}
-                className="hover:bg-blue-200/60 p-0.5 rounded-full text-blue-600 transition-colors"
-                title="Elimină filtru"
-              >
-                <X size={13} />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
       {listings.length === 0 ? (
-        <div className="bg-white rounded-2xl p-12 text-center border border-slate-200 shadow-sm flex flex-col items-center justify-center">
-          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 text-slate-400">
-            <Filter size={32} />
-          </div>
-          <h3 className="text-lg font-bold text-slate-800 mb-2">
-            Niciun rezultat găsit
-          </h3>
-          <p className="text-slate-500 max-w-md mb-6">
-            Nu am găsit niciun anunț care să se potrivească filtrelor selectate. Încearcă să elimini din filtre sau să cauți alt termen.
+        <div className="flex flex-col items-center justify-center py-16 px-4 text-center bg-slate-50 dark:bg-[#141c24] rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 my-4">
+          <p className="text-base font-semibold text-slate-700 dark:text-slate-300 mb-1">
+            Nu au fost găsite anunțuri
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-4">
+            Încearcă să resetezi filtrele de căutare pentru a vedea mai multe oferte.
           </p>
           {onResetFilters && (
             <button
               type="button"
               onClick={onResetFilters}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full text-sm shadow transition-all"
+              className="px-4 py-2 bg-[#03c1a2] text-white text-xs font-bold rounded-xl shadow-xs hover:bg-[#02a88d] transition-colors flex items-center gap-1.5"
             >
-              <RotateCcw size={16} />
-              Resetează toate filtrele
+              <RotateCcw size={14} />
+              <span>Resetează filtrele</span>
             </button>
           )}
         </div>
+      ) : viewMode === 'list' ? (
+        /* Modern List View Container with Interactive Carousel */
+        <div className="flex flex-col gap-3 mb-10">
+          {listings.map((item) => (
+            <ListingListCard
+              key={item.id}
+              item={item}
+              isFav={favorites.includes(item.id)}
+              onToggleFavorite={onToggleFavorite}
+              onSelectListing={onSelectListing}
+              isPhoneRevealed={revealedPhones[item.id]}
+              onTogglePhoneReveal={togglePhoneReveal}
+            />
+          ))}
+        </div>
       ) : (
-        <div className="subito-grid-view subito-grid-view--large">
-          {listings.map((item) => {
-            const isFav = favorites.includes(item.id);
-            return (
-              <Link
-                key={item.id}
-                href={`/anunt/${item.id}`}
-                className="sbt-card"
-                onClick={() => onSelectListing && onSelectListing(item)}
-              >
-                {/* Subito Picture Container */}
-                <div
-                  className={`sbt-picture-container ${
-                    item.category === 'auto-acc' ? 'sbt-picture-container--vertical' : ''
-                  }`}
-                >
-                  <img src={item.image} alt={item.title} className="sbt-image" />
-
-                  {/* Promoted Red Badge OR Photo Count Badge */}
-                  {item.isPromoted ? (
-                    <span className="sbt-promo-badge-red">Fereastra de afișare</span>
-                  ) : (
-                    <div className="sbt-count-badge">
-                      <Camera size={13} />
-                      <span>{item.photoCount}</span>
-                    </div>
-                  )}
-
-                  {/* Favorite Heart Circle */}
-                  <button
-                    className={`sbt-fav-button ${isFav ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onToggleFavorite(item.id, e);
-                    }}
-                    title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
-                  >
-                    <Heart
-                      size={18}
-                      fill={isFav ? '#f9423a' : 'none'}
-                      color={isFav ? '#f9423a' : '#717e8f'}
-                    />
-                  </button>
-                </div>
-
-                {/* Subito Details Area */}
-                <div className="sbt-details">
-                  {/* Subject Title */}
-                  <h3 className="sbt-subject" title={item.title}>
-                    {item.title}
-                  </h3>
-
-                  {/* Price Row */}
-                  <div className="sbt-price-row">
-                    <span className="sbt-price">{item.price.toLocaleString('ro-RO')} €</span>
-                    {item.hasShipping && (
-                      <span title="Livrare disponibilă" className="sbt-shipping-truck flex items-center">
-                        <Truck size={17} />
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Location & Date */}
-                  <div className="sbt-location-container">
-                    <span className="sbt-town">{item.location}</span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+        /* Modern Grid View */
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-2 sm:gap-2.5 mb-10">
+          {listings.map((item) => (
+            <CarListingCard
+              key={item.id}
+              item={item}
+              isFav={favorites.includes(item.id)}
+              onToggleFavorite={onToggleFavorite}
+              onSelectListing={onSelectListing}
+            />
+          ))}
         </div>
       )}
     </section>
   );
 };
-

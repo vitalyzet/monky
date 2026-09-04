@@ -1,0 +1,66 @@
+export const BRAND_LOGOS_MAP: Record<string, string> = {
+  // Car Brands
+  'Abarth': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/abarth.svg',
+  'Alfa Romeo': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/alfaromeo.svg',
+  'Audi': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/audi.svg',
+  'BMW': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/bmw.svg',
+  'Citroën': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/citroen.svg',
+  'Cupra': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/cupra.svg',
+  'Dacia': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/dacia.svg',
+  'DS Automobiles': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/ds.svg',
+  'Ferrari': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/ferrari.svg',
+  'Fiat': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/fiat.svg',
+  'Ford': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/ford.svg',
+  'Honda': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/honda.svg',
+  'Hyundai': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg',
+  'Jaguar': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/jaguar.svg',
+  'Jeep': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/jeep.svg',
+  'Kia': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/kia.svg',
+  'Lancia': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/lancia.svg',
+  'Land Rover': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/landrover.svg',
+  'Lexus': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/lexus.svg',
+  'Maserati': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/maserati.svg',
+  'Mazda': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/mazda.svg',
+  'Mercedes-Benz': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/mercedes.svg',
+  'Mini': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/mini.svg',
+  'Mitsubishi': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/mitsubishi.svg',
+  'Nissan': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/nissan.svg',
+  'Opel': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/opel.svg',
+  'Peugeot': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/peugeot.svg',
+  'Porsche': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/porsche.svg',
+  'Renault': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/renault.svg',
+  'SEAT': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/seat.svg',
+  'Skoda': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/skoda.svg',
+  'Smart': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/smart.svg',
+  'Subaru': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/subaru.svg',
+  'Suzuki': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/suzuki.svg',
+  'Tesla': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/tesla.svg',
+  'Toyota': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg',
+  'Volkswagen': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/volkswagen.svg',
+  'Volvo': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/volvo.svg',
+
+  // Motorcycle Brands
+  'Aprilia': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/aprilia.svg',
+  'Ducati': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/ducati.svg',
+  'Harley-Davidson': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/harleydavidson.svg',
+  'KTM': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/ktm.svg',
+  'Kawasaki': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/kawasaki.svg',
+  'Triumph': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/triumph.svg',
+  'Yamaha': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/yamaha.svg',
+  'Vespa': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/vespa.svg',
+  'Husqvarna': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/husqvarna.svg',
+  'Piaggio': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/piaggio.svg',
+  'Moto Guzzi': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/motoguzzi.svg',
+  'Indian': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/indianmotorcycle.svg',
+  'Royal Enfield': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/royalenfield.svg',
+  'Zero Motorcycles': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/zeromotorcycles.svg',
+  'Super Soco': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/supersoco.svg',
+  'Niu': 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/niu.svg',
+};
+
+export function getBrandLogo(brandName: string): string | null {
+  if (!brandName || brandName === 'Orice' || brandName === 'Alte mărci') {
+    return null;
+  }
+  return BRAND_LOGOS_MAP[brandName] || null;
+}

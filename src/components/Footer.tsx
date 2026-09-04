@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { ArrowRight, ArrowUp, Facebook, Instagram } from 'lucide-react';
-import { Tendinte } from './Tendinte';
+import Link from 'next/link';
+import { Facebook, Instagram, Youtube, Linkedin, ArrowUp } from 'lucide-react';
+import { MonkyLogo } from './MonkyLogo';
 
 export const Footer: React.FC = () => {
   const scrollToTop = () => {
@@ -10,111 +11,260 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="bg-[#f0f2f5] text-[#0a192f] pt-16 pb-8 px-6 mt-16 font-sans">
+    <footer className="bg-white dark:bg-[#181818] text-slate-900 dark:text-slate-200 pt-12 pb-10 px-6 mt-16 font-sans border-t border-slate-200/80 dark:border-[#2a2a2a] transition-colors relative">
       <div className="max-w-[1200px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          {/* CONTACT */}
+        {/* Top Logo */}
+        <div className="mb-10 flex items-center justify-between">
+          <Link href="/" className="inline-block">
+            <MonkyLogo height={40} />
+          </Link>
+
+          {/* Scroll to top button */}
+          <button
+            type="button"
+            onClick={scrollToTop}
+            className="w-9 h-9 rounded-full bg-slate-100 dark:bg-[#252525] hover:bg-slate-200 dark:hover:bg-[#303030] text-slate-600 dark:text-slate-300 flex items-center justify-center transition-all shadow-xs hover:scale-105"
+            title="Înapoi sus"
+          >
+            <ArrowUp size={16} />
+          </button>
+        </div>
+
+        {/* 6 Link Columns (Matching User Screenshot) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-6 gap-y-8 mb-12">
+          {/* Col 1: DESPRE TEVINDE */}
           <div>
-            <h3 className="font-bold mb-6 text-sm tracking-widest uppercase text-[#0a192f]">Contact</h3>
-            <div className="space-y-4 text-[15px]">
-              <div>
-                <span className="block mb-1 text-[#0a192f]/80">E-mail:</span>
-                <a href="mailto:contact@pinpin.ro" className="font-semibold text-[#0a192f] underline decoration-[#0a192f]/40 hover:decoration-[#0a192f] underline-offset-4">contact@pinpin.ro</a>
-              </div>
-              <div>
-                <span className="block mb-1 text-[#0a192f]/80">Instagram:</span>
-                <a href="#" className="font-semibold text-[#0a192f] underline decoration-[#0a192f]/40 hover:decoration-[#0a192f] underline-offset-4">@pinpin.ro</a>
-              </div>
-              <div>
-                <span className="block mb-1 text-[#0a192f]/80">Facebook:</span>
-                <a href="#" className="font-semibold text-[#0a192f] underline decoration-[#0a192f]/40 hover:decoration-[#0a192f] underline-offset-4">@pinpin.ro</a>
-              </div>
-              <div>
-                <span className="block mb-1 text-[#0a192f]/80">Telefon:</span>
-                <a href="tel:+40743565030" className="font-semibold text-[#0a192f] underline decoration-[#0a192f]/40 hover:decoration-[#0a192f] underline-offset-4">+40 743 565 030</a>
-              </div>
-            </div>
+            <h3 className="font-black mb-4 text-[12px] tracking-wider uppercase text-slate-900 dark:text-white">
+              Despre Tevinde
+            </h3>
+            <ul className="space-y-2.5 text-[13.5px]">
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Despre noi
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Prețuri
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Cariere
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Informații juridice
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* AJUTOR */}
+          {/* Col 2: PENTRU EXPERȚI */}
           <div>
-            <h3 className="font-bold mb-6 text-sm tracking-widest uppercase text-[#0a192f]">Ajutor</h3>
-            <div className="space-y-4 text-[15px] flex flex-col">
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Politica de confidențialitate</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Politica de retur</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Termeni și condiții</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">A.N.P.C.</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">A.N.P.C. - SAL</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">A.N.P.C. Reclamații</a>
-            </div>
+            <h3 className="font-black mb-4 text-[12px] tracking-wider uppercase text-slate-900 dark:text-white">
+              Pentru Experți
+            </h3>
+            <ul className="space-y-2.5 text-[13.5px]">
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Publicitate
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Ghid vânzare
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* UTILE */}
+          {/* Col 3: INSTRUMENTE UTILE */}
           <div>
-            <h3 className="font-bold mb-6 text-sm tracking-widest uppercase text-[#0a192f]">Utile</h3>
-            <div className="space-y-4 text-[15px] flex flex-col">
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Contact</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Întrebări frecvente</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Livrare</a>
-              <a href="#" className="text-[#0a192f] hover:font-semibold transition-all">Retur</a>
-            </div>
+            <h3 className="font-black mb-4 text-[12px] tracking-wider uppercase text-slate-900 dark:text-white">
+              Instrumente Utile
+            </h3>
+            <ul className="space-y-2.5 text-[13.5px]">
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Index cartiere
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Articole utile
+                </Link>
+              </li>
+            </ul>
           </div>
 
-          {/* REDUCERI PERIODICE */}
+          {/* Col 4: PLATFORME */}
           <div>
-            <h3 className="font-bold mb-6 text-sm tracking-widest uppercase text-[#0a192f]">Reduceri periodice</h3>
-            <div className="relative mb-4">
-              <input 
-                type="email" 
-                placeholder="Introdu adresa ta de e-mail" 
-                className="w-full bg-white border border-[#0a192f]/20 placeholder-[#0a192f]/50 text-sm py-3 px-4 rounded focus:outline-none focus:ring-1 focus:ring-[#0a192f]/40 transition-all text-[#0a192f]"
-              />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 text-[#0a192f] hover:scale-110 transition-transform">
-                <ArrowRight size={18} />
-              </button>
-            </div>
-            <p className="text-sm leading-relaxed mb-8 text-[#0a192f]/90">
-              Abonează-te pentru a beneficia de promoții exclusive și multe altele!
-            </p>
-            
-            <h3 className="font-bold mb-4 text-sm tracking-widest uppercase text-[#0a192f]">Urmărește-ne</h3>
-            <div className="flex gap-4 text-[#0a192f]">
-              <a href="#" className="hover:scale-110 transition-transform"><Facebook size={22} strokeWidth={1.5} /></a>
-              <a href="#" className="hover:scale-110 transition-transform"><Instagram size={22} strokeWidth={1.5} /></a>
-              <a href="#" className="hover:scale-110 transition-transform">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 2v14.5A4.5 4.5 0 1 1 10.5 12"/>
-                  <path d="M15 6.5A5.5 5.5 0 0 0 20.5 12"/>
+            <h3 className="font-black mb-4 text-[12px] tracking-wider uppercase text-slate-900 dark:text-white">
+              Platforme
+            </h3>
+            <ul className="space-y-2.5 text-[13.5px]">
+              <li>
+                <Link href="/" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Tevinde.ro
+                </Link>
+              </li>
+              <li>
+                <Link href="/cautare?category=coches" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Autoturisme
+                </Link>
+              </li>
+              <li>
+                <Link href="/cautare?category=inmobiliaria" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Imobiliare
+                </Link>
+              </li>
+              <li>
+                <Link href="/cautare?category=servicios" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Servicii
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 5: HARTĂ SITE */}
+          <div>
+            <h3 className="font-black mb-4 text-[12px] tracking-wider uppercase text-slate-900 dark:text-white">
+              Hartă Site
+            </h3>
+            <ul className="space-y-2.5 text-[13.5px]">
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Hartă site
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Localități
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Col 6: CONTACT */}
+          <div>
+            <h3 className="font-black mb-4 text-[12px] tracking-wider uppercase text-slate-900 dark:text-white">
+              Contact
+            </h3>
+            <ul className="space-y-2.5 text-[13.5px]">
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Asistență
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  Ajutor
+                </Link>
+              </li>
+              <li>
+                <Link href="#" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
+                  DSA
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Full-width Divider Line */}
+        <div className="w-full border-t border-slate-200 dark:border-[#2a2a2a] my-8" />
+
+        {/* Middle Bar: Social & Mobile Apps (Exact Design from Screenshot) */}
+        <div className="py-2 mb-8 flex flex-wrap items-center justify-center lg:justify-between gap-6">
+          {/* Left: URMĂREȘTE-NE PE */}
+          <div className="flex items-center gap-3.5">
+            <span className="text-[12px] sm:text-[13px] font-black tracking-wider uppercase text-slate-900 dark:text-white select-none">
+              Urmărește-ne pe:
+            </span>
+            <div className="flex items-center gap-2.5 text-white">
+              {/* Facebook */}
+              <a
+                href="#"
+                className="w-7 h-7 rounded-full bg-black dark:bg-slate-800 flex items-center justify-center hover:opacity-80 transition-opacity"
+                title="Facebook"
+              >
+                <Facebook size={14} className="fill-current stroke-none text-white" />
+              </a>
+              {/* YouTube */}
+              <a
+                href="#"
+                className="w-7 h-7 rounded-full bg-black dark:bg-slate-800 flex items-center justify-center hover:opacity-80 transition-opacity"
+                title="YouTube"
+              >
+                <Youtube size={14} className="fill-current stroke-none text-white" />
+              </a>
+              {/* Instagram */}
+              <a
+                href="#"
+                className="w-7 h-7 rounded-full bg-black dark:bg-slate-800 flex items-center justify-center hover:opacity-80 transition-opacity"
+                title="Instagram"
+              >
+                <Instagram size={14} className="text-white" />
+              </a>
+              {/* TikTok */}
+              <a
+                href="#"
+                className="w-7 h-7 rounded-full bg-black dark:bg-slate-800 flex items-center justify-center hover:opacity-80 transition-opacity"
+                title="TikTok"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.82 4.49 6.27 6.27 0 0 0 1.89-4.49V8.78a8.28 8.28 0 0 0 4.84 1.55v-3.5a4.84 4.84 0 0 1-.96-.14Z"/>
                 </svg>
+              </a>
+              {/* LinkedIn */}
+              <a
+                href="#"
+                className="w-7 h-7 rounded-md bg-black dark:bg-slate-800 flex items-center justify-center hover:opacity-80 transition-opacity"
+                title="LinkedIn"
+              >
+                <Linkedin size={13} className="fill-current stroke-none text-white" />
+              </a>
+            </div>
+          </div>
+
+          {/* Vertical Divider */}
+          <div className="hidden lg:block h-6 w-[1px] bg-slate-300 dark:bg-slate-700 mx-2" />
+
+          {/* Right: APLICAȚII MOBILE */}
+          <div className="flex items-center gap-3.5">
+            <span className="text-[12px] sm:text-[13px] font-black tracking-wider uppercase text-slate-900 dark:text-white select-none">
+              Aplicații mobile:
+            </span>
+            <div className="flex items-center gap-3">
+              <a href="#" className="hover:opacity-85 transition-opacity inline-block">
+                <img src="/app_store.svg" alt="Download on the App Store" className="h-[38px] w-auto" />
+              </a>
+              <a href="#" className="hover:opacity-85 transition-opacity inline-block">
+                <img src="/google_play.svg" alt="Get it on Google Play" className="h-[38px] w-auto" />
               </a>
             </div>
           </div>
         </div>
 
-        <Tendinte />
+        {/* Full-width Divider Line */}
+        <div className="w-full border-t border-slate-200 dark:border-[#2a2a2a] my-6" />
 
-        {/* BOTTOM SECTION */}
-        <div className="pt-6 border-t border-[#0a192f]/10 flex flex-col md:flex-row justify-between items-center gap-6 relative">
-          <div className="text-sm text-[#0a192f]/80">
-            © 2026, PinPin. Toate drepturile rezervate.
-          </div>
-          
-          <div className="flex flex-wrap gap-2 md:mr-14 justify-center">
-            <span className="bg-white px-2 py-1.5 text-[10px] font-bold rounded shadow-sm text-blue-600 tracking-wider border border-[#0a192f]/5">AMEX</span>
-            <span className="bg-white px-2 py-1.5 text-[10px] font-bold rounded shadow-sm text-black tracking-wider border border-[#0a192f]/5">Apple Pay</span>
-            <span className="bg-white px-2 py-1.5 text-[10px] font-bold rounded shadow-sm text-orange-500 tracking-wider border border-[#0a192f]/5">Discover</span>
-            <span className="bg-white px-2 py-1.5 text-[10px] font-bold rounded shadow-sm text-gray-700 tracking-wider border border-[#0a192f]/5">G Pay</span>
-            <span className="bg-white px-2 py-1.5 text-[10px] font-bold rounded shadow-sm text-red-600 tracking-wider border border-[#0a192f]/5">Mastercard</span>
-            <span className="bg-white px-2 py-1.5 text-[10px] font-bold rounded shadow-sm text-blue-800 tracking-wider border border-[#0a192f]/5">VISA</span>
-          </div>
-
-          <button 
-            onClick={scrollToTop}
-            className="md:absolute right-0 top-1/2 md:-translate-y-1/2 bg-[#0a192f] text-white p-3.5 rounded-full shadow-md hover:shadow-lg transition-all hover:-translate-y-[calc(50%+2px)]"
-            aria-label="Volver arriba"
-          >
-            <ArrowUp size={20} strokeWidth={2} />
-          </button>
+        {/* Bottom Copyright & Legal Links (Matching Screenshot) */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-xs text-slate-500 dark:text-slate-400">
+          <span>© 2026 Tevinde.ro</span>
+          <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+          <Link href="#" className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide hover:underline">
+            Condiții de utilizare
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+          <Link href="#" className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide hover:underline">
+            Politica de confidențialitate
+          </Link>
+          <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+          <Link href="#" className="font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wide hover:underline">
+            Setări cookies
+          </Link>
         </div>
       </div>
     </footer>
