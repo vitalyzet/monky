@@ -101,9 +101,6 @@ export const metadata: Metadata = {
     apple: '/tevinde-logo-thumb.png',
   },
   category: 'classifieds',
-  verification: {
-    google: 'bomgAyB3XBbQpKgKW_ZFwyg1dNXpNRO9NSvZ6Jou21A',
-  },
 };
 
 const jsonLdWebSite = {
