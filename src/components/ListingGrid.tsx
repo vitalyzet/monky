@@ -181,7 +181,7 @@ export const CarListingCard: React.FC<{
               <button
                 type="button"
                 onClick={prevImage}
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-6.5 h-6.5 rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
                 title="Fotografia anterioară"
               >
                 <ChevronLeft size={15} />
@@ -191,7 +191,7 @@ export const CarListingCard: React.FC<{
               <button
                 type="button"
                 onClick={nextImage}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-6.5 h-6.5 rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full bg-black/50 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all opacity-0 group-hover:opacity-100 z-20 outline-none cursor-pointer"
                 title="Fotografia următoare"
               >
                 <ChevronRight size={15} />
@@ -201,7 +201,7 @@ export const CarListingCard: React.FC<{
             {/* Floating Heart Button in dark circular blur */}
             <button
               type="button"
-              className="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 w-7 h-7 sm:w-8.5 sm:h-8.5 rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer shadow-sm"
+              className="absolute top-1.5 right-1.5 sm:top-2.5 sm:right-2.5 w-7 h-7 sm:w-[34px] sm:h-[34px] rounded-full bg-black/45 hover:bg-black/65 backdrop-blur-md text-white flex items-center justify-center z-10 transition-transform active:scale-90 hover:scale-105 cursor-pointer shadow-sm"
               onClick={(e) => onToggleFavorite(item.id, e)}
               title={isFav ? 'Elimină din favorite' : 'Adaugă la favorite'}
             >
@@ -269,7 +269,7 @@ export const CarListingCard: React.FC<{
               <img
                 src={sellerAvatar}
                 alt=""
-                className="w-4.5 h-4.5 sm:w-5 sm:h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-2xs"
+                className="w-[18px] h-[18px] sm:w-5 sm:h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700 flex-shrink-0 shadow-2xs"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = getDistinctSellerAvatar(item.seller?.name, (item as any).userId);
                 }}

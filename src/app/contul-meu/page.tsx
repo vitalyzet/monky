@@ -648,7 +648,7 @@ export default function ContulMeuPage() {
 
         {/* 1. Stripe Verification Banner */}
         <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-700 rounded-3xl p-6 md:p-7 text-white shadow-xl shadow-emerald-900/10 mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex items-start md:items-center gap-4.5">
+          <div className="flex items-start md:items-center gap-4">
             <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center flex-shrink-0 text-white shadow-inner">
               <TrendingUp size={28} />
             </div>

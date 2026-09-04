@@ -168,7 +168,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 if (e.key === 'Enter') handleSearchSubmit();
               }}
               placeholder="Căutare..."
-              className="w-full pl-8.5 pr-7 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-[#161f28] border border-slate-200/90 dark:border-[#2d3b49] rounded-full text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#03c1a2] transition-colors shadow-2xs"
+              className="w-full pl-[34px] pr-7 py-1.5 text-xs sm:text-sm bg-slate-100 dark:bg-[#161f28] border border-slate-200/90 dark:border-[#2d3b49] rounded-full text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#03c1a2] transition-colors shadow-2xs"
             />
             {searchQuery && (
               <button

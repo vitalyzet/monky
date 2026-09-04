@@ -143,7 +143,7 @@ export const BottomNav: React.FC = () => {
           }`}
         >
           {userAvatar ? (
-            <div className={`w-5.5 h-5.5 rounded-full overflow-hidden border ${isAccountActive ? 'border-[#03c1a2]' : 'border-slate-300 dark:border-slate-600'}`}>
+            <div className={`w-[22px] h-[22px] rounded-full overflow-hidden border ${isAccountActive ? 'border-[#03c1a2]' : 'border-slate-300 dark:border-slate-600'}`}>
               <img
                 src={userAvatar}
                 alt="Avatar"

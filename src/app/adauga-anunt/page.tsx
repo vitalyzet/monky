@@ -922,7 +922,7 @@ export default function AdaugaAnuntPage() {
                                       key={sub}
                                       type="button"
                                       onClick={() => setSubCategory(sub)}
-                                      className={`group p-4 sm:p-4.5 rounded-2xl text-left transition-all border-2 flex items-center justify-between gap-3.5 cursor-pointer ${
+                                      className={`group p-4 sm:p-4 rounded-2xl text-left transition-all border-2 flex items-center justify-between gap-3.5 cursor-pointer ${
                                         isSubSelected
                                           ? 'bg-[#03c1a2] text-white border-[#03c1a2] shadow-lg shadow-[#03c1a2]/25 scale-[1.01]'
                                           : 'bg-white dark:bg-[#242424] border-slate-200/90 dark:border-[#333] text-slate-800 dark:text-slate-100 hover:border-[#03c1a2] hover:bg-slate-50/70 dark:hover:bg-[#2c2c2c] hover:shadow-xs'
@@ -1142,7 +1142,7 @@ export default function AdaugaAnuntPage() {
                                       <span className={`w-3 h-3 rounded-full flex-shrink-0 ${c.badgeColor}`} />
                                       <span className="font-bold text-sm sm:text-[15px]">{c.label}</span>
                                     </div>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 pl-5.5 leading-relaxed">
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 pl-5 leading-relaxed">
                                       {c.desc}
                                     </p>
                                   </div>

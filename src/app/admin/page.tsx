@@ -1094,7 +1094,7 @@ export default function AdminDashboardPage() {
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/42.svg'; }}
                               />
                               {/* Dark Circular Heart Button (Top Right) */}
-                              <div className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
+                              <div className="absolute top-2.5 right-2.5 w-[34px] h-[34px] rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
                                 <Heart size={16} className="text-white" />
                               </div>
                               {/* Dark Pill Year Badge (Bottom Left) */}
@@ -1132,7 +1132,7 @@ export default function AdminDashboardPage() {
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/42.svg'; }}
                               />
                               {/* Dark Circular Heart Button (Top Right) */}
-                              <div className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
+                              <div className="absolute top-2.5 right-2.5 w-[34px] h-[34px] rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
                                 <Heart size={16} className="text-white" />
                               </div>
                               {/* Dark Pill Year Badge (Bottom Left) */}
@@ -1170,7 +1170,7 @@ export default function AdminDashboardPage() {
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/42.svg'; }}
                               />
                               {/* Dark Circular Heart Button (Top Right) */}
-                              <div className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
+                              <div className="absolute top-2.5 right-2.5 w-[34px] h-[34px] rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
                                 <Heart size={16} className="text-white" />
                               </div>
                               {/* Dark Pill Year Badge (Bottom Left) */}
@@ -1208,7 +1208,7 @@ export default function AdminDashboardPage() {
                                 onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/42.svg'; }}
                               />
                               {/* Dark Circular Heart Button (Top Right) */}
-                              <div className="absolute top-2.5 right-2.5 w-8.5 h-8.5 rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
+                              <div className="absolute top-2.5 right-2.5 w-[34px] h-[34px] rounded-full bg-black/45 backdrop-blur-md text-white flex items-center justify-center shadow-sm">
                                 <Heart size={16} className="text-white" />
                               </div>
                               {/* Dark Pill Year Badge (Bottom Left) */}
