@@ -216,7 +216,7 @@ export default function HomePage() {
     }
   }, [loading]);
 
-  const [visibleCount, setVisibleCount] = useState(25);
+  const [visibleCount, setVisibleCount] = useState(24);
   const [showStickyHeader, setShowStickyHeader] = useState(false);
 
   // Scroll listener to toggle floating sticky search header when scrolling past main search box
@@ -235,7 +235,7 @@ export default function HomePage() {
 
   // Reset visible count when active tab or filters change
   useEffect(() => {
-    setVisibleCount(25);
+    setVisibleCount(24);
   }, [activeTab, selectedType, selectedBrand, selectedModel, selectedCategory, searchQuery, locationInput, selectedPrice]);
 
   const handleTabChange = (newTab: string) => {
@@ -539,7 +539,7 @@ export default function HomePage() {
                 <div className="flex justify-center my-6">
                   <button
                     type="button"
-                    onClick={() => setVisibleCount((prev) => prev + 25)}
+                    onClick={() => setVisibleCount((prev) => prev + 24)}
                     className="bg-[#38d39f] hover:bg-[#31c794] active:scale-95 text-[#18222d] text-sm font-extrabold px-7 py-2.5 rounded-full shadow-sm hover:shadow transition-all duration-200 cursor-pointer select-none"
                   >
                     Încarcă mai multe
