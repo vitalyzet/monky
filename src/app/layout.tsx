@@ -92,10 +92,10 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/6ba82cfe-a73d-4741-9f6b-3916424ba990.png' },
+      { url: '/tevinde-logo-thumb.png' },
       { url: '/logo.svg', type: 'image/svg+xml' },
     ],
-    apple: '/6ba82cfe-a73d-4741-9f6b-3916424ba990.png',
+    apple: '/tevinde-logo-thumb.png',
   },
   category: 'classifieds',
   verification: {
@@ -126,7 +126,7 @@ const jsonLdOrganization = {
   '@type': 'Organization',
   name: 'Tevinde.ro',
   url: 'https://tevinde.ro',
-  logo: 'https://tevinde.ro/6ba82cfe-a73d-4741-9f6b-3916424ba990.png',
+  logo: 'https://tevinde.ro/tevinde-logo-thumb.png',
   contactPoint: {
     '@type': 'ContactPoint',
     contactType: 'customer support',
@@ -142,6 +142,8 @@ export default function RootLayout({
   return (
     <html lang="ro" className={`dark ${nunito.variable}`} suppressHydrationWarning>
       <head>
+      </head>
+      <body className="bg-[#F2F3F6] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans" suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
@@ -150,8 +152,6 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
         />
-      </head>
-      <body className="bg-[#F2F3F6] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200 font-sans" suppressHydrationWarning>
         <AuthProvider>
           <ThemeProvider>
             {children}
