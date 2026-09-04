@@ -158,7 +158,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Inline Compact Search Input inside Navbar when scrolled */}
         {isSearchVisible && (
-          <div className="flex-1 max-w-md mx-2 sm:mx-4 relative flex items-center animate-in fade-in duration-300">
+          <div className="flex-1 max-w-[180px] sm:max-w-[240px] md:max-w-xs lg:max-w-md mx-1.5 sm:mx-3 md:mx-4 relative flex items-center animate-in fade-in duration-300">
             <Search className="absolute left-3 text-slate-400 flex-shrink-0" size={14} />
             <input
               type="text"
@@ -183,13 +183,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
 
         {/* Nav Actions */}
-        <div className="nav-actions flex items-center gap-1.5 sm:gap-3">
+        <div className="nav-actions flex items-center gap-1 sm:gap-1.5 md:gap-2 lg:gap-3 flex-shrink-0">
           {/* Language Selector Pill */}
           <div className="relative">
             <button
               type="button"
               onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-300/80 dark:border-slate-700/80 bg-slate-100/80 dark:bg-[#1e2732] hover:bg-slate-200 dark:hover:bg-[#283443] text-slate-800 dark:text-slate-100 text-xs font-bold transition-all shadow-2xs"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 md:px-3 py-1.5 rounded-xl border border-slate-300/80 dark:border-slate-700/80 bg-slate-100/80 dark:bg-[#1e2732] hover:bg-slate-200 dark:hover:bg-[#283443] text-slate-800 dark:text-slate-100 text-xs font-bold transition-all shadow-2xs"
               title="Schimbă Limba / Change Language"
             >
               <span className="text-sm leading-none">{lang === 'RO' ? '🇷🇴' : lang === 'EN' ? '🇬🇧' : '🇪🇸'}</span>
@@ -228,18 +228,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           {!isSearchVisible && (
             <button
               onClick={toggleTheme}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
+              className="p-2 sm:px-2.5 md:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
               title={theme === 'dark' ? 'Comută pe modul Luminos' : 'Comută pe modul Întunecat'}
             >
               {theme === 'dark' ? (
                 <>
                   <Sun size={18} className="text-amber-400" />
-                  <span className="hidden md:inline text-xs text-amber-300 font-medium">Luminos</span>
+                  <span className="hidden lg:inline text-xs text-amber-300 font-medium">Luminos</span>
                 </>
               ) : (
                 <>
                   <Moon size={18} className="text-slate-600" />
-                  <span className="hidden md:inline text-xs text-slate-600 font-medium">Întunecat</span>
+                  <span className="hidden lg:inline text-xs text-slate-600 font-medium">Întunecat</span>
                 </>
               )}
             </button>
@@ -248,7 +248,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Search Button (Hidden when compact search is visible) */}
           {!isSearchVisible && (
             <button
-              className="p-2 sm:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
+              className="p-2 sm:px-2.5 md:px-3 sm:py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors flex items-center gap-1.5"
               onClick={() => {
                 const el = document.getElementById('listings-section');
                 if (el) {
@@ -260,30 +260,30 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Căutare"
             >
               <Search size={18} />
-              <span className="hidden sm:inline text-xs font-semibold">Căutare</span>
+              <span className="hidden lg:inline text-xs font-semibold">Căutare</span>
             </button>
           )}
 
-          {/* Desktop-only: Salvate Button (Handled by BottomNav on mobile) */}
+          {/* Desktop/Tablet: Salvate Button (Handled by BottomNav on mobile) */}
           <button
             type="button"
             onClick={() => setIsFavoritesOpen(true)}
-            className="cursor-pointer relative hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold"
+            className="cursor-pointer relative hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold"
             title="Vezi anunțurile salvate"
           >
             <Heart size={18} className={favCount > 0 ? "fill-rose-500 text-rose-500" : ""} />
-            <span>Salvate</span>
+            <span className="hidden lg:inline">Salvate</span>
             {favCount > 0 && (
-              <span className="ml-1 px-2 py-0.5 text-xs bg-rose-100 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 font-black rounded-full">
+              <span className="ml-0.5 px-1.5 py-0.5 text-[11px] bg-rose-100 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 font-black rounded-full leading-none">
                 {favCount}
               </span>
             )}
           </button>
 
-          {/* Desktop-only: User Account Menu (Handled by BottomNav on mobile) */}
+          {/* Desktop/Tablet: User Account Menu (Handled by BottomNav on mobile) */}
           {currentUser ? (
             <div className="relative group hidden md:block">
-              <Link href="/contul-meu" className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold">
+              <Link href="/contul-meu" className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold">
                 {navUserAvatar ? (
                   <div className="w-6 h-6 rounded-full overflow-hidden border border-[#bbf0dc] dark:border-emerald-500/40 bg-slate-100 dark:bg-[#1a1a1a] flex-shrink-0 flex items-center justify-center">
                     <img
@@ -298,7 +298,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ) : (
                   <User size={18} />
                 )}
-                <span className="max-w-[110px] truncate font-semibold" title={currentUser.email || ''}>
+                <span className="max-w-[90px] lg:max-w-[110px] truncate font-semibold" title={currentUser.email || ''}>
                   {formatPublicName(navUserName || currentUser.displayName || currentUser.email?.split('@')[0])}
                 </span>
               </Link>
@@ -334,16 +334,16 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             </div>
           ) : (
-            <Link href="/contul-meu" className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold">
+            <Link href="/contul-meu" className="hidden md:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold">
               <User size={18} />
               <span>Contul meu</span>
             </Link>
           )}
 
-          {/* Desktop-only: Adaugă Anunț Button (Elevated center button in BottomNav on mobile) */}
+          {/* Desktop/Tablet: Adaugă Anunț Button (Elevated center button in BottomNav on mobile) */}
           <Link
             href="/adauga-anunt"
-            className="hidden md:inline-flex items-center gap-1.5 bg-[#03c1a2] hover:bg-[#02a88d] text-slate-950 font-extrabold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md transition-all active:scale-95"
+            className="hidden md:inline-flex items-center gap-1.5 bg-[#03c1a2] hover:bg-[#02a88d] text-slate-950 font-extrabold px-3 py-2 lg:px-4 lg:py-2 rounded-xl text-xs sm:text-sm shadow-md transition-all active:scale-95 whitespace-nowrap flex-shrink-0"
           >
             <PlusCircle size={17} />
             <span>Adaugă Anunț</span>

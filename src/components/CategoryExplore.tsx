@@ -92,7 +92,7 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
         <div
           ref={scrollContainerRef}
           onScroll={checkScrollPosition}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
           className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-2 xs:gap-x-2.5 sm:gap-x-3.5 gap-y-3 sm:gap-y-4 overflow-x-auto pt-1 pb-2 scroll-smooth no-scrollbar w-full px-0.5 outline-none"
         >
           {OFFICIAL_CATEGORIES.map((cat, index) => {

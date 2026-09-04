@@ -73,7 +73,7 @@ export const BottomNav: React.FC = () => {
   return (
     <nav
       aria-label="Navigare mobilă"
-      className="fixed bottom-0 left-0 right-0 z-40 block sm:hidden bg-white/95 dark:bg-[#15161a]/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-[#26282e] shadow-[0_-4px_24px_rgba(0,0,0,0.18)] select-none"
+      className="fixed bottom-0 left-0 right-0 z-40 block md:hidden bg-white/95 dark:bg-[#15161a]/95 backdrop-blur-xl border-t border-slate-200/90 dark:border-[#26282e] shadow-[0_-4px_24px_rgba(0,0,0,0.18)] select-none"
       style={{
         paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
       }}

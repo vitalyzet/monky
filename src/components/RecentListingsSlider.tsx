@@ -124,7 +124,7 @@ export const RecentListingsSlider: React.FC<RecentListingsSliderProps> = ({
         ref={scrollContainerRef}
         onScroll={checkScrollPosition}
         className="flex items-stretch gap-3 sm:gap-3.5 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}
       >
         {recentListings.map((item) => {
           const isFav = favorites.includes(item.id);

@@ -550,9 +550,9 @@ function SearchContent() {
 
         {/* Search & Filter Header Bar */}
         <div className="bg-white dark:bg-[#1a222d] border border-slate-200/90 dark:border-[#2d3b49] rounded-2xl sm:rounded-3xl p-4 sm:p-5 shadow-xs mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
             {/* Field 1: Ce căutați? */}
-            <div className="md:col-span-5">
+            <div className="md:col-span-2 lg:col-span-5">
               <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block mb-1">
                 Ce căutați?
               </label>
@@ -586,7 +586,7 @@ function SearchContent() {
             </div>
 
             {/* Field 2: În ce categorie? / Subcategorie */}
-            <div className="md:col-span-4">
+            <div className="md:col-span-1 lg:col-span-4">
               <CategoryDropdown
                 value={activeCategory ? selectedType : categoryParam || 'Orice'}
                 onChange={(newVal) => {
@@ -613,7 +613,7 @@ function SearchContent() {
             </div>
 
             {/* Field 3: Unde? with GPS Distance button */}
-            <div className="md:col-span-3">
+            <div className="md:col-span-1 lg:col-span-3">
               <div className="flex items-center justify-between mb-1">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Unde? (Distanță km)

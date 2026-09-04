@@ -2077,3 +2077,17 @@ html, body {
     gap: 4px;
   }
 }
+
+/* ---- TABLET / IPAD: screens from 640px to 1024px ---- */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .main-container {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    max-width: 100% !important;
+  }
+
+  .navbar-inner {
+    padding: 10px 16px !important;
+    max-width: 100% !important;
+  }
+}
