@@ -2044,3 +2044,36 @@ a.group:hover h3,
   left: 180%;
   transition: left 0.6s ease-in-out;
 }
+
+/* ============================================================
+   MOBILE RESPONSIVE OVERRIDES (Pure CSS - No Tailwind dependency)
+   Ensures mobile layout works regardless of Tailwind JIT issues
+   ============================================================ */
+
+/* Force proper box sizing and prevent horizontal overflow */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+}
+
+/* ---- MOBILE: screens below 640px ---- */
+@media (max-width: 639px) {
+
+  /* Main container: full width with small padding */
+  .main-container {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Navbar: compact on mobile */
+  .navbar-inner {
+    padding: 6px 10px !important;
+    gap: 4px;
+  }
+}

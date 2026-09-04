@@ -470,7 +470,7 @@ export default function HomePage() {
   const displayCount = filteredListings.length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f4f7f8] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col bg-[#f4f7f8] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden">
       <Navbar
         favoriteCount={favorites.length}
         onResetSearch={handleResetFilters}

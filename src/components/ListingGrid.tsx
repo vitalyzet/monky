@@ -544,7 +544,7 @@ export const ListingListCard: React.FC<ListingListCardProps> = ({
     <Link
       key={item.id}
       href={getListingUrl(item)}
-      className="bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 flex flex-row items-stretch h-[140px] xs:h-[155px] sm:h-[235px] md:h-[245px] group cursor-pointer overflow-hidden block text-inherit no-underline"
+      className="bg-white dark:bg-[#1e2732] rounded-2xl border border-slate-200/90 dark:border-[#2f3d4d] shadow-2xs hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 flex flex-row items-stretch h-[140px] xs:h-[155px] sm:h-[235px] md:h-[245px] group cursor-pointer overflow-hidden text-inherit no-underline"
       onClick={() => {
         if (typeof window !== 'undefined') {
           sessionStorage.setItem('lastViewedAdId', item.id);

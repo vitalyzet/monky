@@ -88,12 +88,12 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
           </button>
         )}
 
-        {/* Horizontal 2-row grid container with all official categories */}
+        {/* Single 2-row horizontal scroll carousel for all screen sizes */}
         <div
           ref={scrollContainerRef}
           onScroll={checkScrollPosition}
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-2.5 sm:gap-x-3.5 gap-y-3.5 sm:gap-y-4 overflow-x-auto pt-1 pb-2 scroll-smooth no-scrollbar w-full px-0.5 outline-none"
+          className="grid grid-rows-2 grid-flow-col auto-cols-max gap-x-2 xs:gap-x-2.5 sm:gap-x-3.5 gap-y-3 sm:gap-y-4 overflow-x-auto pt-1 pb-2 scroll-smooth no-scrollbar w-full px-0.5 outline-none"
         >
           {OFFICIAL_CATEGORIES.map((cat, index) => {
             return (
@@ -104,24 +104,19 @@ export const CategoryExplore: React.FC<CategoryExploreProps> = () => {
                 style={{
                   animationDelay: `${index * 16}ms`,
                 }}
-                className={`flex-shrink-0 w-[92px] sm:w-[106px] flex flex-col items-center cursor-pointer group/card select-none snap-start text-center focus:outline-none transition-transform duration-300 ease-out hover:-translate-y-2 ${
+                className={`flex-shrink-0 w-[76px] xs:w-[88px] sm:w-[106px] flex flex-col items-center cursor-pointer group/card select-none snap-start text-center focus:outline-none transition-transform duration-300 ease-out hover:-translate-y-2 ${
                   isMounted ? 'animate-card-enter' : 'opacity-0'
                 }`}
               >
-                {/* Horizontal Rounded Light Box with Individual 3D Motion */}
-                <div className="w-[90px] h-[74px] sm:w-[104px] sm:h-[82px] rounded-xl sm:rounded-2xl overflow-hidden border border-white/90 dark:border-[#2f4943] bg-white dark:bg-[#1a2d28] shadow-xs flex items-center justify-center relative transition-all duration-300 ease-out group-hover/card:border-[#03c1a2] group-hover/card:shadow-[0_12px_26px_-4px_rgba(3,193,162,0.4)] group-hover/card:scale-105 active:scale-95">
+                <div className="w-[72px] h-[60px] xs:w-[84px] xs:h-[70px] sm:w-[104px] sm:h-[82px] rounded-xl sm:rounded-2xl overflow-hidden border border-white/90 dark:border-[#2f4943] bg-white dark:bg-[#1a2d28] shadow-xs flex items-center justify-center relative transition-all duration-300 ease-out group-hover/card:border-[#03c1a2] group-hover/card:shadow-[0_12px_26px_-4px_rgba(3,193,162,0.4)] group-hover/card:scale-105 active:scale-95">
                   <img
                     src={cat.image}
                     alt={cat.name}
                     className="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/card:scale-115 group-hover/card:-translate-y-1 group-hover/card:rotate-[-2deg] group-hover/card:brightness-105"
                   />
-
-                  {/* Individual Light Beam Sheen Sweep on hover */}
                   <div className="card-sheen-sweep" />
                 </div>
-
-                {/* Title Label placed BELOW box */}
-                <span className="text-[11px] sm:text-[12px] font-bold text-[#1a332f] dark:text-slate-200 group-hover/card:text-[#039e84] dark:group-hover/card:text-[#03c1a2] group-hover/card:-translate-y-0.5 leading-snug text-center mt-2 line-clamp-2 px-0.5 max-w-[100px] transition-all duration-200">
+                <span className="text-[10px] xs:text-[11px] sm:text-[12px] font-bold text-[#1a332f] dark:text-slate-200 group-hover/card:text-[#039e84] dark:group-hover/card:text-[#03c1a2] group-hover/card:-translate-y-0.5 leading-snug text-center mt-1.5 sm:mt-2 line-clamp-2 px-0.5 max-w-[80px] xs:max-w-[90px] sm:max-w-[100px] transition-all duration-200">
                   {cat.name}
                 </span>
               </button>

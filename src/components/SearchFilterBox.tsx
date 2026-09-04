@@ -195,16 +195,16 @@ export const SearchFilterBox: React.FC<SearchFilterBoxProps> = ({
         <div className="hidden sm:block w-[1px] bg-slate-200 dark:bg-[#2d3a4b] self-stretch my-2" />
 
         {/* Mobile Row for Location & Button */}
-        <div className="flex flex-row sm:contents border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80">
+        <div className="flex flex-col xs:flex-row sm:contents border-t sm:border-t-0 border-slate-100 dark:border-slate-800/80 min-w-0">
           {/* Field 2: Toată țara */}
-          <div className="flex-1 sm:w-[260px] lg:w-[320px] flex items-center px-3.5 sm:px-5 py-2.5 sm:py-3.5 gap-2 sm:gap-3">
+          <div className="flex-1 min-w-0 sm:w-[260px] lg:w-[320px] flex items-center px-3.5 sm:px-5 py-2.5 sm:py-3.5 gap-2 sm:gap-3">
             <MapPin size={18} className="text-slate-500 dark:text-slate-400 flex-shrink-0 stroke-[2.2] sm:w-[20px] sm:h-[20px]" />
             <input
               type="text"
               value={locationInput}
               onChange={(e) => setLocationInput(e.target.value)}
               placeholder="Toată țara"
-              className="w-full bg-transparent text-[15px] sm:text-base text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none truncate"
+              className="w-full bg-transparent text-[15px] sm:text-base text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none truncate min-w-0"
             />
             {locationInput && locationInput !== 'Toată țara' && (
               <button
@@ -222,9 +222,9 @@ export const SearchFilterBox: React.FC<SearchFilterBoxProps> = ({
           <button
             type="submit"
             disabled={isSearching}
-            className="bg-[#002f34] hover:bg-[#002226] disabled:bg-[#002f34]/85 dark:bg-[#03c1a2] dark:hover:bg-[#02a88d] dark:disabled:bg-[#03c1a2]/80 text-white font-bold px-5 sm:px-9 py-2.5 sm:py-3.5 flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:cursor-wait flex-shrink-0 text-[15px] sm:text-base select-none w-auto rounded-br-2xl sm:rounded-none active:scale-[0.99] border-l sm:border-l-0 border-slate-100 dark:border-slate-800/80"
+            className="bg-[#002f34] hover:bg-[#002226] disabled:bg-[#002f34]/85 dark:bg-[#03c1a2] dark:hover:bg-[#02a88d] dark:disabled:bg-[#03c1a2]/80 text-white font-bold px-5 sm:px-9 py-3 sm:py-3.5 flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:cursor-wait flex-shrink-0 text-[15px] sm:text-base select-none w-full xs:w-auto rounded-b-2xl xs:rounded-bl-none xs:rounded-br-2xl sm:rounded-none active:scale-[0.99] border-t xs:border-t-0 xs:border-l sm:border-l-0 border-slate-100 dark:border-slate-800/80"
           >
-            <span className="hidden xs:inline">Căutare</span>
+            <span className="inline">Căutare</span>
             {isSearching ? (
               <Loader2 size={18} className="animate-spin text-white" />
             ) : (
