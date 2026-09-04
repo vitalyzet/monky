@@ -396,21 +396,31 @@ function SearchContent() {
     });
   }, [filteredListings, userCoords, locationInput]);
 
-  // Sorted listings (Closest distance, Newest, Price)
+  // Sorted listings (Promoted first, then by selected sort)
   const sortedListings = useMemo(() => {
     const list = [...listingsWithDistanceAndBrand];
-    if (sortBy === 'distance') {
-      list.sort((a, b) => {
+    list.sort((a, b) => {
+      // 1. Promoted always first
+      if (a.isPromoted && !b.isPromoted) return -1;
+      if (!a.isPromoted && b.isPromoted) return 1;
+
+      // 2. Then apply selected sort
+      if (sortBy === 'distance') {
         if (a.distanceKm === null && b.distanceKm === null) return 0;
         if (a.distanceKm === null) return 1;
         if (b.distanceKm === null) return -1;
         return a.distanceKm - b.distanceKm;
-      });
-    } else if (sortBy === 'price_asc') {
-      list.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
-    } else if (sortBy === 'price_desc') {
-      list.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
-    }
+      } else if (sortBy === 'price_asc') {
+        return (Number(a.price) || 0) - (Number(b.price) || 0);
+      } else if (sortBy === 'price_desc') {
+        return (Number(b.price) || 0) - (Number(a.price) || 0);
+      } else if (sortBy === 'newest') {
+        const timeA = (a as any).createdAtTime || (a as any).timestamp?.seconds * 1000 || 0;
+        const timeB = (b as any).createdAtTime || (b as any).timestamp?.seconds * 1000 || 0;
+        return timeB - timeA;
+      }
+      return 0;
+    });
     return list;
   }, [listingsWithDistanceAndBrand, sortBy]);
 

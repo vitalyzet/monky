@@ -389,7 +389,16 @@ export default function HomePage() {
       }
     }
 
-    return base;
+    return base.sort((a, b) => {
+      // 1. Promoted always first
+      if (a.isPromoted && !b.isPromoted) return -1;
+      if (!a.isPromoted && b.isPromoted) return 1;
+
+      // 2. Then newest first
+      const timeA = (a as any).createdAtTime || (a as any).timestamp?.seconds * 1000 || 0;
+      const timeB = (b as any).createdAtTime || (b as any).timestamp?.seconds * 1000 || 0;
+      return timeB - timeA;
+    });
   }, [
     realListings,
     activeTab,
