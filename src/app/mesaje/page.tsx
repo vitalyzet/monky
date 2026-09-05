@@ -197,6 +197,32 @@ function ChatContent() {
     'Acceptați schimburi?',
   ];
 
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#f4f7f8] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors">
+        <Navbar favoriteCount={0} />
+        <main className="flex-grow max-w-[1240px] w-full mx-auto px-2 sm:px-4 py-3 sm:py-6 flex flex-col items-center justify-center">
+          <div className="bg-white dark:bg-[#1c1d22] p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xl max-w-md w-full text-center">
+            <div className="w-20 h-20 bg-slate-100 dark:bg-[#26272e] rounded-full flex items-center justify-center mx-auto mb-5">
+              <MessageCircle size={32} className="text-[#03c1a2]" />
+            </div>
+            <h2 className="text-2xl font-black mb-3">Mesajele tale</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+              Trebuie să fii autentificat pentru a vizualiza mesajele, a discuta cu vânzătorii și a trimite oferte.
+            </p>
+            <Link
+              href="/autentificare"
+              className="block w-full py-3.5 bg-[#03c1a2] hover:bg-[#02ab8f] text-slate-950 font-black rounded-xl transition-all shadow-sm active:scale-95"
+            >
+              Conectează-te acum
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#f4f7f8] dark:bg-[#131417] text-slate-900 dark:text-slate-100 transition-colors">
       <Navbar favoriteCount={0} />
