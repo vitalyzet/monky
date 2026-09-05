@@ -3,13 +3,15 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Search, Plus, Heart, User } from 'lucide-react';
+import { Home, Search, Plus, Heart, User, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import { getTotalUnreadChatCount } from '@/lib/chatService';
 
 export const BottomNav: React.FC = () => {
   const pathname = usePathname();
   const { currentUser } = useAuth();
   const [favCount, setFavCount] = useState<number>(0);
+  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
 
   // Sync favorites count
@@ -52,6 +54,20 @@ export const BottomNav: React.FC = () => {
       window.removeEventListener('monky_avatar_updated', syncAvatar);
     };
   }, [currentUser]);
+
+  // Sync unread chat count
+  useEffect(() => {
+    const syncChat = () => {
+      setUnreadChatCount(getTotalUnreadChatCount());
+    };
+    syncChat();
+    window.addEventListener('storage', syncChat);
+    window.addEventListener('monky_chat_updated', syncChat);
+    return () => {
+      window.removeEventListener('storage', syncChat);
+      window.removeEventListener('monky_chat_updated', syncChat);
+    };
+  }, []);
 
   // If viewing a listing detail page (/anunt/[id]), hide bottom nav in favor of the sticky contact bar
   if (pathname && pathname.startsWith('/anunt/')) {
@@ -116,22 +132,25 @@ export const BottomNav: React.FC = () => {
           </Link>
         </div>
 
-        {/* 4. Favorite (Slide-over drawer trigger) */}
-        <button
-          type="button"
-          onClick={handleOpenFavorites}
-          className="flex flex-col items-center justify-center py-1 relative text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-all active:scale-90 cursor-pointer"
+        {/* 4. Mesaje / Chat */}
+        <Link
+          href="/mesaje"
+          className={`flex flex-col items-center justify-center py-1 relative transition-all active:scale-90 ${
+            pathname === '/mesaje'
+              ? 'text-[#03c1a2]'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+          }`}
         >
           <div className="relative">
-            <Heart size={21} className={favCount > 0 ? 'fill-rose-500 text-rose-500 stroke-[1.8]' : 'stroke-[1.8]'} />
-            {favCount > 0 && (
-              <span className="absolute -top-1 -right-2 bg-rose-500 text-white text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
-                {favCount > 9 ? '9+' : favCount}
+            <MessageCircle size={21} className={pathname === '/mesaje' ? 'stroke-[2.4]' : 'stroke-[1.8]'} />
+            {unreadChatCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-[#03c1a2] text-slate-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                {unreadChatCount > 9 ? '9+' : unreadChatCount}
               </span>
             )}
           </div>
-          <span className="text-[10px] font-bold mt-0.5 tracking-tight">Favorite</span>
-        </button>
+          <span className="text-[10px] font-bold mt-0.5 tracking-tight">Mesaje</span>
+        </Link>
 
         {/* 5. Contul Meu */}
         <Link

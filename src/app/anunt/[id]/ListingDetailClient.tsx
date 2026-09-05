@@ -36,10 +36,13 @@ import {
   CheckCircle2,
   X,
   Clock,
+  Tag,
 } from 'lucide-react';
 import { isUserFollowed, toggleFollowUser } from '@/lib/follow';
 import { useAuth } from '@/lib/AuthContext';
 import { formatPublicName } from '@/lib/stringUtils';
+import { OfferModal } from '@/components/OfferModal';
+import { getOrCreateConversationForListing, sendChatMessage } from '@/lib/chatService';
 
 export default function ListingDetailClient({
   initialListing,
@@ -149,17 +152,42 @@ export default function ListingDetailClient({
     const newState = await toggleFollowUser(sellerName, resolvedSellerAvatar, listing?.userId, currentUser);
     setIsFollowing(newState);
   };
+  const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [messageText, setMessageText] = useState('Bună, mă interesează oferta dumneavoastră. Mai este valabilă?');
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const [isMessageSent, setIsMessageSent] = useState(false);
 
   const handleSendMessage = () => {
-    if (isSendingMessage || isMessageSent || !messageText.trim()) return;
+    if (isSendingMessage || !messageText.trim() || !listing) return;
     setIsSendingMessage(true);
-    setTimeout(() => {
+
+    try {
+      const buyerName = currentUser?.displayName || (typeof window !== 'undefined' ? localStorage.getItem('monky_user_name') : null) || 'Eu';
+      const buyerAvatar = currentUser?.photoURL || (typeof window !== 'undefined' ? localStorage.getItem('monky_user_avatar') : null) || '/images/avatar/an61.png';
+      const buyerId = currentUser?.uid || 'current-user-id';
+
+      const conv = getOrCreateConversationForListing(listing, {
+        id: buyerId,
+        name: buyerName,
+        avatar: buyerAvatar,
+      });
+
+      sendChatMessage(conv.id, messageText.trim(), {
+        id: buyerId,
+        name: buyerName,
+        avatar: buyerAvatar,
+      });
+
       setIsSendingMessage(false);
       setIsMessageSent(true);
-    }, 1200);
+
+      setTimeout(() => {
+        router.push(`/mesaje?id=${conv.id}`);
+      }, 700);
+    } catch (err) {
+      console.error(err);
+      setIsSendingMessage(false);
+    }
   };
 
   const [timeAgo, setTimeAgo] = useState('');
@@ -838,6 +866,16 @@ export default function ListingDetailClient({
                   )}
                 </button>
               </div>
+
+              {/* Make Offer Button */}
+              <button
+                type="button"
+                onClick={() => setIsOfferModalOpen(true)}
+                className="w-full bg-[#03c1a2] hover:bg-[#02ab8f] active:scale-[0.99] text-slate-950 font-black py-3 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-[#03c1a2]/20 text-sm sm:text-base cursor-pointer"
+              >
+                <Tag size={18} className="stroke-[2.5]" />
+                <span>Fă o ofertă de preț</span>
+              </button>
             </div>
 
             {/* Card 2: Contact Form Card */}
@@ -971,27 +1009,30 @@ export default function ListingDetailClient({
           {/* Call Seller Button */}
           <a
             href={listing.seller?.phone ? `tel:${listing.seller.phone.replace(/\s+/g, '')}` : 'tel:0742891304'}
-            className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold h-11 px-3 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md shadow-emerald-600/25 transition-all whitespace-nowrap"
+            className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-emerald-600/25 transition-all whitespace-nowrap"
           >
-            <Phone size={16} className="fill-white flex-shrink-0" />
+            <Phone size={15} className="fill-white flex-shrink-0" />
             <span>Sună</span>
           </a>
 
-          {/* Send Message Button (Smooth scrolls to message box) */}
+          {/* Make Offer Button Mobile */}
           <button
             type="button"
-            onClick={() => {
-              const el = document.querySelector('textarea');
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                el.focus();
-              }
-            }}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold h-11 px-3 rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md shadow-blue-600/25 transition-all whitespace-nowrap"
+            onClick={() => setIsOfferModalOpen(true)}
+            className="flex-1 bg-[#03c1a2] hover:bg-[#02ab8f] active:scale-95 text-slate-950 font-black h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-[#03c1a2]/20 transition-all whitespace-nowrap cursor-pointer"
           >
-            <MessageCircle size={16} className="flex-shrink-0" />
-            <span>Mesaj</span>
+            <Tag size={15} className="stroke-[2.5] flex-shrink-0" />
+            <span>Ofertă</span>
           </button>
+
+          {/* Send Message Button */}
+          <Link
+            href={`/mesaje?listing=${listing.id}`}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-blue-600/25 transition-all whitespace-nowrap"
+          >
+            <MessageCircle size={15} className="flex-shrink-0" />
+            <span>Chat</span>
+          </Link>
         </div>
       </div>
 
@@ -1081,6 +1122,16 @@ export default function ListingDetailClient({
             </Link>
           </div>
         </div>
+      )}
+
+      {/* Offer Modal */}
+      {isOfferModalOpen && (
+        <OfferModal
+          isOpen={isOfferModalOpen}
+          onClose={() => setIsOfferModalOpen(false)}
+          listing={listing}
+          currentUser={currentUser}
+        />
       )}
     </div>
   );

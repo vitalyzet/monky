@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { PlusCircle, Heart, User, Search, Car, LogOut, Sun, Moon, Package, X, Shield, ChevronDown, Check } from 'lucide-react';
+import { PlusCircle, Heart, User, Search, Car, LogOut, Sun, Moon, Package, X, Shield, ChevronDown, Check, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useTheme } from '@/lib/ThemeContext';
 import { auth } from '@/lib/firebase';
@@ -11,6 +11,7 @@ import { signOut } from 'firebase/auth';
 import { MonkyLogo } from './MonkyLogo';
 import { formatPublicName } from '@/lib/stringUtils';
 import { FavoritesDrawer } from './FavoritesDrawer';
+import { getTotalUnreadChatCount } from '@/lib/chatService';
 
 interface NavbarProps {
   favoriteCount: number;
@@ -48,6 +49,20 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [navUserAvatar, setNavUserAvatar] = React.useState<string | null>(null);
   const [navUserName, setNavUserName] = React.useState<string>('');
   const [isFavoritesOpen, setIsFavoritesOpen] = React.useState<boolean>(false);
+  const [unreadChatCount, setUnreadChatCount] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const syncChat = () => {
+      setUnreadChatCount(getTotalUnreadChatCount());
+    };
+    syncChat();
+    window.addEventListener('monky_chat_updated', syncChat);
+    window.addEventListener('storage', syncChat);
+    return () => {
+      window.removeEventListener('monky_chat_updated', syncChat);
+      window.removeEventListener('storage', syncChat);
+    };
+  }, []);
 
   React.useEffect(() => {
     const updateFavs = () => {
@@ -278,6 +293,21 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </button>
 
+          {/* Desktop/Tablet: Mesaje / Chat Button */}
+          <Link
+            href="/mesaje"
+            className="relative hidden sm:flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#283443] transition-colors text-xs font-bold"
+            title="Vezi mesajele și ofertele"
+          >
+            <MessageCircle size={18} className={unreadChatCount > 0 ? "text-[#03c1a2]" : ""} />
+            <span className="hidden lg:inline">Mesaje</span>
+            {unreadChatCount > 0 && (
+              <span className="ml-0.5 px-1.5 py-0.5 text-[10px] bg-[#03c1a2] text-slate-950 font-black rounded-full leading-none shadow-xs">
+                {unreadChatCount}
+              </span>
+            )}
+          </Link>
+
           {/* Desktop/Tablet: User Account Menu (Handled by BottomNav on mobile) */}
           {currentUser ? (
             <div className="relative group hidden md:block">
@@ -307,6 +337,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <User size={16} />
                   Contul meu
+                </Link>
+                <Link
+                  href="/mesaje"
+                  className="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-[#333333] flex items-center justify-between rounded-lg font-medium transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <MessageCircle size={16} />
+                    <span>Mesaje & Chat</span>
+                  </div>
+                  {unreadChatCount > 0 && (
+                    <span className="px-1.5 py-0.5 text-[10px] bg-[#03c1a2] text-slate-950 font-black rounded-full">
+                      {unreadChatCount}
+                    </span>
+                  )}
                 </Link>
                 <Link
                   href="/anunturile-mele"

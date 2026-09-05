@@ -43,12 +43,14 @@ import {
   Upload,
   ImageIcon,
   Clock,
+  Tag,
 } from 'lucide-react';
 import { signOut, updateProfile, updatePassword, sendPasswordResetEmail, deleteUser } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 import { getFollowedUsers, getFollowers, toggleFollowUser, isUserFollowed, FollowItem } from '@/lib/follow';
 import { formatPublicName } from '@/lib/stringUtils';
+import { getChatConversations, ChatConversation } from '@/lib/chatService';
 
 const AVATAR_OPTIONS = [
   '/images/avatar/an32.png',
@@ -1874,8 +1876,73 @@ export default function ContulMeuPage() {
           )}
 
           {activeTab === 'mesaje' && (
-            <div className="py-8 text-center text-slate-500 dark:text-slate-400 text-sm">
-              Ai 1 mesaj necitit de la cumpărători.
+            <div className="py-4 space-y-4">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-gradient-to-r from-[#03c1a2]/15 to-emerald-500/10 rounded-2xl border border-[#03c1a2]/30">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-[#03c1a2] text-slate-950 flex items-center justify-center font-bold">
+                    <MessageCircle size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-slate-900 dark:text-white">
+                      Centrul tău de Mesaje & Oferte
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Discută în timp real cu vânzătorii și cumpărătorii și negociază prin oferte oficiale.
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/mesaje"
+                  className="bg-[#03c1a2] hover:bg-[#02ab8f] text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all whitespace-nowrap"
+                >
+                  <span>Deschide Chat-ul Complet</span>
+                  <ChevronRight size={16} />
+                </Link>
+              </div>
+
+              {/* Conversations List Preview */}
+              <div className="divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-[#1a2332] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+                {getChatConversations().map((conv) => (
+                  <Link
+                    key={conv.id}
+                    href={`/mesaje?id=${conv.id}`}
+                    className="p-4 flex items-center justify-between gap-3 hover:bg-slate-50 dark:hover:bg-[#202b3c] transition-colors group block"
+                  >
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-700 flex-shrink-0 border border-slate-200 dark:border-slate-700">
+                        <img
+                          src={conv.listingImage || '/42.svg'}
+                          alt={conv.listingTitle}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-sm text-slate-900 dark:text-white truncate max-w-xs group-hover:text-[#03c1a2] transition-colors">
+                            {conv.listingTitle}
+                          </h4>
+                          {conv.currentOffer && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-md bg-[#03c1a2]/15 text-[#03c1a2] border border-[#03c1a2]/30">
+                              <Tag size={10} />
+                              <span>{conv.currentOffer.amount.toLocaleString('ro-RO')} {conv.currentOffer.currency}</span>
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-sm mt-0.5">
+                          {conv.lastMessage}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs font-semibold text-[#03c1a2] group-hover:underline">
+                        Răspunde →
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
           )}
 
