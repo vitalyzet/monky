@@ -57,7 +57,7 @@ import {
   formatDistanceKm,
   Coordinates,
 } from '@/lib/geoUtils';
-import { prewarmAllListings } from '@/lib/adCache';
+import { prewarmAllListings, restoreScrollToLastCard } from '@/lib/adCache';
 
 const POPULAR_CAR_BRANDS = [
   'Audi',
@@ -136,9 +136,30 @@ function SearchContent() {
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
   const [visibleCount, setVisibleCount] = useState(12);
 
+  // Prevent page collapse on back navigation to stop browser from clamping scroll to footer
+  const [minContainerHeight, setMinContainerHeight] = useState<number | undefined>(() => {
+    if (typeof window !== 'undefined') {
+      const savedHeight = sessionStorage.getItem('monky_page_height');
+      if (savedHeight) {
+        const h = parseInt(savedHeight, 10);
+        if (!isNaN(h) && h > 400) return h;
+      }
+      const savedScroll = sessionStorage.getItem('monky_scroll_pos');
+      if (savedScroll) {
+        const s = parseInt(savedScroll, 10);
+        if (!isNaN(s) && s > 0) return s + 800;
+      }
+    }
+    return undefined;
+  });
+
   // Hydrate cached listings immediately on client mount without hydration mismatch
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+
       if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
         setRealListings((window as any).__MONKY_ALL_LISTINGS);
         setLoading(false);
@@ -166,30 +187,9 @@ function SearchContent() {
   // Seamless scroll restoration when returning from details page
   useEffect(() => {
     if (realListings.length > 0) {
-      try {
-        const savedScroll = sessionStorage.getItem('monky_scroll_pos');
-        const lastId = sessionStorage.getItem('lastViewedAdId');
-
-        if (savedScroll) {
-          const pos = parseInt(savedScroll, 10);
-          sessionStorage.removeItem('monky_scroll_pos');
-          sessionStorage.removeItem('lastViewedAdId');
-          if (!isNaN(pos) && pos > 0) {
-            window.scrollTo({ top: pos, behavior: 'instant' as any });
-            return;
-          }
-        }
-
-        if (lastId) {
-          sessionStorage.removeItem('lastViewedAdId');
-          const el = document.getElementById(`ad-card-${lastId}`);
-          if (el) {
-            el.scrollIntoView({ behavior: 'instant' as any, block: 'center' });
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
+      restoreScrollToLastCard(() => {
+        setMinContainerHeight(undefined);
+      });
     }
   }, [realListings.length]);
 
@@ -212,6 +212,7 @@ function SearchContent() {
     return false;
   }, [activeCategory, categoryParam]);
 
+  const isInitialParamsMount = React.useRef(true);
   useEffect(() => {
     setSearchQuery(searchParams.get('q') || '');
     setSelectedType(searchParams.get('type') || 'Orice');
@@ -219,7 +220,11 @@ function SearchContent() {
     setSelectedModel(searchParams.get('model') || 'Orice');
     setLocationInput(searchParams.get('loc') || 'Toată România');
     setSelectedPrice(searchParams.get('price') || 'Orice');
-    setVisibleCount(12);
+    if (isInitialParamsMount.current) {
+      isInitialParamsMount.current = false;
+    } else {
+      setVisibleCount(12);
+    }
   }, [searchParams]);
 
   // Request user GPS coordinates on mount
@@ -623,7 +628,10 @@ function SearchContent() {
     <div className="min-h-screen flex flex-col bg-[#f8fafc] dark:bg-[#131417]">
       <Navbar favoriteCount={favorites.length} />
 
-      <main className="main-container flex-grow py-6">
+      <main
+        className="main-container flex-grow py-6"
+        style={minContainerHeight ? { minHeight: `${minContainerHeight}px` } : undefined}
+      >
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-4 px-1">
           <Link href="/" className="hover:text-slate-900 dark:hover:text-white transition-colors">

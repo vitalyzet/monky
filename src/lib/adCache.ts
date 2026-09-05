@@ -39,7 +39,7 @@ export function prewarmListing(item: any) {
 }
 
 /**
- * Saves current scroll position and clicked ad id before navigating
+ * Saves current scroll position, clicked ad id, page height, and URL before navigating
  */
 export function recordCardClick(item: any) {
   if (typeof window === 'undefined' || !item) return;
@@ -47,7 +47,67 @@ export function recordCardClick(item: any) {
     sessionStorage.setItem('monky_scroll_pos', window.scrollY.toString());
     sessionStorage.setItem('lastViewedAdId', item.id);
     sessionStorage.setItem('monky_last_search_url', window.location.pathname + window.location.search);
+    sessionStorage.setItem('monky_page_height', document.documentElement.scrollHeight.toString());
   } catch (e) {}
+}
+
+/**
+ * Restores scroll to the last viewed ad card or pixel offset.
+ * Retries across multiple animation frames so it waits until the DOM has rendered cards,
+ * preventing the browser from prematurely clamping scroll to the footer.
+ */
+export function restoreScrollToLastCard(onComplete?: () => void) {
+  if (typeof window === 'undefined') return;
+
+  // 1. Tell browser not to automatically scroll to clamped footer before React renders
+  if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual';
+  }
+
+  const savedPosStr = sessionStorage.getItem('monky_scroll_pos');
+  const lastId = sessionStorage.getItem('lastViewedAdId');
+  if (!savedPosStr && !lastId) {
+    if (onComplete) onComplete();
+    return;
+  }
+
+  const targetY = savedPosStr ? parseInt(savedPosStr, 10) : 0;
+  let attempts = 0;
+  const maxAttempts = 30; // ~1.5s total polling window
+
+  const attemptScroll = () => {
+    attempts++;
+    let restored = false;
+
+    // A) First priority: locate the exact card DOM element and center it
+    if (lastId) {
+      const cardEl = document.getElementById(`ad-card-${lastId}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ block: 'center', behavior: 'instant' as ScrollBehavior });
+        restored = true;
+      }
+    }
+
+    // B) Second priority: if card element not found yet, but document is tall enough
+    if (!restored && targetY > 0 && document.documentElement.scrollHeight >= targetY + 150) {
+      window.scrollTo({ top: targetY, behavior: 'instant' as ScrollBehavior });
+      restored = true;
+    }
+
+    if (restored || attempts >= maxAttempts) {
+      // Clean up after successful restoration or timeout
+      sessionStorage.removeItem('monky_scroll_pos');
+      sessionStorage.removeItem('lastViewedAdId');
+      sessionStorage.removeItem('monky_page_height');
+      if (onComplete) onComplete();
+    } else {
+      requestAnimationFrame(() => {
+        setTimeout(attemptScroll, 40);
+      });
+    }
+  };
+
+  requestAnimationFrame(attemptScroll);
 }
 
 /**

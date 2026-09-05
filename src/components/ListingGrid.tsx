@@ -550,6 +550,7 @@ export const ListingListCard: React.FC<ListingListCardProps> = ({
   return (
     <Link
       key={item.id}
+      id={`ad-card-${item.id}`}
       href={getListingUrl(item)}
       prefetch={true}
       onMouseEnter={() => prewarmListing(item)}

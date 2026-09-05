@@ -13,7 +13,7 @@ import { Footer } from '@/components/Footer';
 import { Listing, CATEGORIES } from '@/data/mockData';
 import { getListings, AdListing } from '@/lib/db';
 import { normalizeText } from '@/lib/stringUtils';
-import { prewarmAllListings } from '@/lib/adCache';
+import { prewarmAllListings, restoreScrollToLastCard } from '@/lib/adCache';
 
 const TYPE_TO_CAT_MAP: Record<string, string> = {
   'Tehnologie și electronică': 'tehnologie-electronica',
@@ -99,8 +99,29 @@ export default function HomePage() {
   const [realListings, setRealListings] = useState<AdListing[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Prevent page collapse on back navigation to stop browser from clamping scroll to footer
+  const [minContainerHeight, setMinContainerHeight] = useState<number | undefined>(() => {
+    if (typeof window !== 'undefined') {
+      const savedHeight = sessionStorage.getItem('monky_page_height');
+      if (savedHeight) {
+        const h = parseInt(savedHeight, 10);
+        if (!isNaN(h) && h > 400) return h;
+      }
+      const savedScroll = sessionStorage.getItem('monky_scroll_pos');
+      if (savedScroll) {
+        const s = parseInt(savedScroll, 10);
+        if (!isNaN(s) && s > 0) return s + 800;
+      }
+    }
+    return undefined;
+  });
+
   // Load favorites, active tab & real listings from memory/sessionStorage + Firestore on mount
   useEffect(() => {
+    if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     // 1. Immediately hydrate from memory/sessionStorage without waiting for network
     if (typeof window !== 'undefined') {
       if ((window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
@@ -237,30 +258,9 @@ export default function HomePage() {
   // Restore scroll position to last viewed ad card when returning from details page
   useEffect(() => {
     if (realListings.length > 0) {
-      try {
-        const savedScroll = sessionStorage.getItem('monky_scroll_pos');
-        const lastId = sessionStorage.getItem('lastViewedAdId');
-
-        if (savedScroll) {
-          const pos = parseInt(savedScroll, 10);
-          sessionStorage.removeItem('monky_scroll_pos');
-          sessionStorage.removeItem('lastViewedAdId');
-          if (!isNaN(pos) && pos > 0) {
-            window.scrollTo({ top: pos, behavior: 'instant' as any });
-            return;
-          }
-        }
-
-        if (lastId) {
-          sessionStorage.removeItem('lastViewedAdId');
-          const el = document.getElementById(`ad-card-${lastId}`);
-          if (el) {
-            el.scrollIntoView({ behavior: 'instant' as any, block: 'center' });
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      }
+      restoreScrollToLastCard(() => {
+        setMinContainerHeight(undefined);
+      });
     }
   }, [realListings.length]);
 
@@ -275,6 +275,7 @@ export default function HomePage() {
     return 24;
   });
   const [showStickyHeader, setShowStickyHeader] = useState(false);
+  const isInitialMount = React.useRef(true);
 
   // Scroll listener to toggle floating sticky search header when scrolling past main search box
   useEffect(() => {
@@ -290,8 +291,12 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Reset visible count when active tab or filters change
+  // Reset visible count only when user actively modifies active tab or filters (not on initial mount/hydration)
   useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
     setVisibleCount(24);
   }, [activeTab, selectedType, selectedBrand, selectedModel, selectedCategory, searchQuery, locationInput, selectedPrice]);
 
@@ -561,7 +566,10 @@ export default function HomePage() {
         showCompactSearch={showStickyHeader}
       />
 
-      <main className="main-container flex-grow">
+      <main
+        className="main-container flex-grow"
+        style={minContainerHeight ? { minHeight: `${minContainerHeight}px` } : undefined}
+      >
         {/* Semantic H1 for Google SEO */}
         <h1 className="sr-only">Tevinde.ro - Anunțuri Gratuite Auto, Moto, Imobiliare și Tehnologie în România</h1>
 
