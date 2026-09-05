@@ -55,7 +55,7 @@ function ChatContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'buying' | 'selling'>('all');
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatScrollContainerRef = useRef<HTMLDivElement>(null);
 
   const currentUserId = currentUser?.uid || 'current-user-id';
   const currentUserName = currentUser?.displayName || (typeof window !== 'undefined' ? localStorage.getItem('monky_user_name') : null) || 'Eu';
@@ -120,14 +120,19 @@ function ChatContent() {
   useEffect(() => {
     if (selectedConvId) {
       markChatConversationAsRead(selectedConvId, false);
-      scrollToBottom();
+      scrollToBottom('auto');
     }
   }, [selectedConvId, activeConversation?.messages.length]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
     setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 60);
+      if (chatScrollContainerRef.current) {
+        chatScrollContainerRef.current.scrollTo({
+          top: chatScrollContainerRef.current.scrollHeight,
+          behavior,
+        });
+      }
+    }, 40);
   };
 
   const handleSendMessage = (textToSend?: string) => {
@@ -141,7 +146,7 @@ function ChatContent() {
     });
 
     setMessageInput('');
-    scrollToBottom();
+    scrollToBottom('smooth');
   };
 
   const handleQuickQuestion = (question: string) => {
@@ -448,7 +453,10 @@ function ChatContent() {
               </div>
 
               {/* Chat Messages Body */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 no-scrollbar">
+              <div
+                ref={chatScrollContainerRef}
+                className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 no-scrollbar"
+              >
                 {/* Security Banner */}
                 <div className="flex items-center justify-center">
                   <div className="bg-slate-100 dark:bg-[#24262e] border border-slate-200 dark:border-slate-700/60 rounded-2xl px-4 py-2 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2 max-w-md text-center">
@@ -586,8 +594,6 @@ function ChatContent() {
                     </div>
                   );
                 })}
-
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Quick Suggestion Chips */}
