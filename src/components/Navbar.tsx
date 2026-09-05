@@ -53,7 +53,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   React.useEffect(() => {
     const syncChat = () => {
-      setUnreadChatCount(getTotalUnreadChatCount());
+      setUnreadChatCount(getTotalUnreadChatCount(currentUser?.uid));
     };
     syncChat();
     window.addEventListener('monky_chat_updated', syncChat);

@@ -449,10 +449,21 @@ export function markChatConversationAsRead(conversationId: string, isSeller = fa
 /**
  * Returns total unread messages count for badge display
  */
-export function getTotalUnreadChatCount(): number {
+export function getTotalUnreadChatCount(currentUserId?: string): number {
   if (typeof window === 'undefined') return 0;
   const all = getChatConversations();
-  return all.reduce((sum, conv) => sum + (conv.unreadCountBuyer || 0), 0);
+  
+  // Default fallback if no user provided
+  const uid = currentUserId || 'current-user-id';
+  
+  return all.reduce((sum, conv) => {
+    if (conv.buyerId === uid) {
+      return sum + (conv.unreadCountBuyer || 0);
+    } else if (conv.sellerId === uid) {
+      return sum + (conv.unreadCountSeller || 0);
+    }
+    return sum;
+  }, 0);
 }
 
 /**

@@ -58,7 +58,7 @@ export const BottomNav: React.FC = () => {
   // Sync unread chat count
   useEffect(() => {
     const syncChat = () => {
-      setUnreadChatCount(getTotalUnreadChatCount());
+      setUnreadChatCount(getTotalUnreadChatCount(currentUser?.uid));
     };
     syncChat();
     window.addEventListener('storage', syncChat);

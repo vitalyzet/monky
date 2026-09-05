@@ -64,8 +64,9 @@ function ChatContent() {
   // Load conversations and subscribe to updates
   const refreshConversations = () => {
     const list = getChatConversations();
-    setConversations(list);
-    return list;
+    const myChats = list.filter((c) => c.buyerId === currentUserId || c.sellerId === currentUserId);
+    setConversations(myChats);
+    return myChats;
   };
 
   useEffect(() => {
@@ -172,8 +173,13 @@ function ChatContent() {
 
   // Filter conversations
   const filteredConversations = conversations.filter((c) => {
+    // Only show conversations where current user is a participant
+    const isParticipant = c.buyerId === currentUserId || c.sellerId === currentUserId;
+    if (!isParticipant) return false;
+
     if (activeTab === 'buying' && c.buyerId !== currentUserId) return false;
-    if (activeTab === 'selling' && c.sellerId !== currentUserId && c.buyerId === currentUserId) return false;
+    if (activeTab === 'selling' && c.sellerId !== currentUserId) return false;
+
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       const matchTitle = c.listingTitle.toLowerCase().includes(q);

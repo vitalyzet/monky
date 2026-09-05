@@ -1903,7 +1903,9 @@ export default function ContulMeuPage() {
 
               {/* Conversations List Preview */}
               <div className="divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-[#1a2332] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
-                {getChatConversations().map((conv) => (
+                {getChatConversations()
+                  .filter((c) => c.buyerId === (currentUser?.uid || 'current-user-id') || c.sellerId === (currentUser?.uid || 'current-user-id'))
+                  .map((conv) => (
                   <Link
                     key={conv.id}
                     href={`/mesaje?id=${conv.id}`}
