@@ -129,8 +129,18 @@ function SearchContent() {
   const [sortBy, setSortBy] = useState<'distance' | 'newest' | 'price_asc' | 'price_desc'>('distance');
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [realListings, setRealListings] = useState<AdListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [realListings, setRealListings] = useState<AdListing[]>(() => {
+    if (typeof window !== 'undefined' && (window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+      return (window as any).__MONKY_ALL_LISTINGS;
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined' && (window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+      return false;
+    }
+    return true;
+  });
   const [isLocating, setIsLocating] = useState(false);
   const [userCoords, setUserCoords] = useState<Coordinates | null>(null);
   const [revealedPhones, setRevealedPhones] = useState<Record<string, boolean>>({});
@@ -296,7 +306,8 @@ function SearchContent() {
       }
 
       try {
-        const firestoreAds = await getListings(true);
+        // Cache-first (5min TTL) for instant loading on return from ad details
+        const firestoreAds = await getListings(false);
         const firestoreIds = new Set(firestoreAds.map((a) => a.id));
 
         // Purge ghost deleted ads from localAds
@@ -319,13 +330,20 @@ function SearchContent() {
 
         if (isMounted) {
           prewarmAllListings(combined);
-          setRealListings(combined);
+          // Only update state if listings actually changed
+          setRealListings((prev) => {
+            if (prev.length === combined.length && prev.length > 0) {
+              const isSame = prev.every((item, idx) => item.id === combined[idx]?.id && item.price === combined[idx]?.price);
+              if (isSame) return prev;
+            }
+            return combined;
+          });
           setLoading(false);
         }
       } catch (err) {
         console.error('Eroare la încărcarea anunțurilor:', err);
         if (isMounted) {
-          setRealListings(localAds);
+          setRealListings((prev) => (prev.length > 0 ? prev : localAds));
           setLoading(false);
         }
       }

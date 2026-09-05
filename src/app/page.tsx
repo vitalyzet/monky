@@ -96,8 +96,18 @@ export default function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [realListings, setRealListings] = useState<AdListing[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [realListings, setRealListings] = useState<AdListing[]>(() => {
+    if (typeof window !== 'undefined' && (window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+      return (window as any).__MONKY_ALL_LISTINGS;
+    }
+    return [];
+  });
+  const [loading, setLoading] = useState(() => {
+    if (typeof window !== 'undefined' && (window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+      return false;
+    }
+    return true;
+  });
 
   // Prevent page collapse on back navigation to stop browser from clamping scroll to footer
   const [minContainerHeight, setMinContainerHeight] = useState<number | undefined>(() => {
@@ -201,7 +211,8 @@ export default function HomePage() {
       }
 
       try {
-        const firestoreAds = await getListings(true);
+        // Use cache-first with 5min TTL so returning from an ad requires 0ms and 0 network requests
+        const firestoreAds = await getListings(false);
         const firestoreIds = new Set(firestoreAds.map((ad) => ad.id));
 
         // Reconcile userAds: purge any ads that were deleted from Firestore
@@ -226,10 +237,18 @@ export default function HomePage() {
           }
         });
         prewarmAllListings(combined);
-        setRealListings(combined);
+
+        // Only update state if data actually changed to prevent flash / full re-render
+        setRealListings((prev) => {
+          if (prev.length === combined.length && prev.length > 0) {
+            const isSame = prev.every((item, idx) => item.id === combined[idx]?.id && item.price === combined[idx]?.price);
+            if (isSame) return prev;
+          }
+          return combined;
+        });
       } catch (err) {
         console.error('Eroare la încărcarea anunțurilor:', err);
-        setRealListings(userAds);
+        setRealListings((prev) => (prev.length > 0 ? prev : userAds));
       } finally {
         setLoading(false);
       }
@@ -602,7 +621,7 @@ export default function HomePage() {
         />
 
         {/* Recent Listings Slider (Anunțuri noi) like in the app */}
-        {!loading && realListings.length > 0 && (
+        {realListings.length > 0 && (
           <RecentListingsSlider
             listings={realListings as any}
             favorites={favorites}

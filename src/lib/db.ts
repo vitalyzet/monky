@@ -117,9 +117,18 @@ let listingsCache: AdListing[] | null = null;
 let cacheTimestamp = 0;
 const individualListingCache = new Map<string, { listing: AdListing; expires: number }>();
 
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes cache
+
 export const getListings = async (forceRefresh = false): Promise<AdListing[]> => {
   const now = Date.now();
-  if (!forceRefresh && listingsCache && now - cacheTimestamp < 60000) {
+
+  // If module cache is empty, check global window memory cache
+  if (!listingsCache && typeof window !== 'undefined' && (window as any).__MONKY_ALL_LISTINGS && (window as any).__MONKY_ALL_LISTINGS.length > 0) {
+    listingsCache = (window as any).__MONKY_ALL_LISTINGS;
+    cacheTimestamp = now;
+  }
+
+  if (!forceRefresh && listingsCache && listingsCache.length > 0 && now - cacheTimestamp < CACHE_TTL_MS) {
     return listingsCache;
   }
 
@@ -156,6 +165,9 @@ export const getListings = async (forceRefresh = false): Promise<AdListing[]> =>
     });
     listingsCache = sorted;
     cacheTimestamp = now;
+    if (typeof window !== 'undefined') {
+      (window as any).__MONKY_ALL_LISTINGS = sorted;
+    }
     return sorted;
   } catch (error) {
     console.error("Error getting documents: ", error);
