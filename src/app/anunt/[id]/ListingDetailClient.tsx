@@ -37,6 +37,9 @@ import {
   X,
   Clock,
   Tag,
+  Send,
+  Check,
+  Sparkles,
 } from 'lucide-react';
 import { isUserFollowed, toggleFollowUser } from '@/lib/follow';
 import { useAuth } from '@/lib/AuthContext';
@@ -82,6 +85,8 @@ export default function ListingDetailClient({
     return () => clearTimeout(timer);
   }, []);
 
+  const [isOwner, setIsOwner] = useState(false);
+
   useEffect(() => {
     async function syncAvatarAndName() {
       const localAvatar = typeof window !== 'undefined' ? localStorage.getItem('monky_user_avatar') : null;
@@ -90,14 +95,15 @@ export default function ListingDetailClient({
       const curDisplayName = (currentUser?.displayName || '').toLowerCase().trim();
       const curEmailName = currentUser?.email ? currentUser.email.split('@')[0].toLowerCase().trim() : '';
 
-      const isOwner = Boolean(
+      const ownerCheck = Boolean(
         currentUser &&
         (listing?.userId === currentUser.uid ||
           (targetSellerName && (curDisplayName === targetSellerName || curEmailName === targetSellerName)))
       );
+      setIsOwner(ownerCheck);
 
       // 1. If viewing own listing or seller name matches, prioritize active user avatar & name
-      if (isOwner) {
+      if (ownerCheck) {
         const myAvatar = localAvatar || currentUser?.photoURL || (listing?.seller as any)?.avatar || (listing?.seller as any)?.avatarUrl;
         const myName = localName || currentUser?.displayName || (currentUser?.email ? currentUser.email.split('@')[0] : listing?.seller?.name);
         if (myAvatar) setResolvedSellerAvatar(myAvatar);
@@ -868,73 +874,92 @@ export default function ListingDetailClient({
               </div>
 
               {/* Make Offer Button */}
-              <button
-                type="button"
-                onClick={() => setIsOfferModalOpen(true)}
-                className="w-full bg-[#03c1a2] hover:bg-[#02ab8f] active:scale-[0.99] text-slate-950 font-black py-3 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-[#03c1a2]/20 text-sm sm:text-base cursor-pointer"
-              >
-                <Tag size={18} className="stroke-[2.5]" />
-                <span>Fă o ofertă de preț</span>
-              </button>
+              {!isOwner && (
+                <button
+                  type="button"
+                  onClick={() => setIsOfferModalOpen(true)}
+                  className="w-full bg-[#03c1a2] hover:bg-[#02ab8f] active:scale-[0.99] text-slate-950 font-black py-3 px-4 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-md shadow-[#03c1a2]/20 text-sm sm:text-base cursor-pointer"
+                >
+                  <Tag size={18} className="stroke-[2.5]" />
+                  <span>Fă o ofertă de preț</span>
+                </button>
+              )}
             </div>
 
             {/* Card 2: Contact Form Card */}
             <div className="bg-white dark:bg-[#262626] rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-slate-200 dark:border-[#333333] shadow-md dark:shadow-2xl flex flex-col gap-4 transition-colors">
-              <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-4">Contactează vânzătorul</h3>
+              {!isOwner ? (
+                <>
+                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-4">Contactează vânzătorul</h3>
 
-              <div className="flex flex-col gap-2">
-                <textarea
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  disabled={isSendingMessage || isMessageSent}
-                  rows={3}
-                  maxLength={3000}
-                  className={`w-full border border-slate-200 dark:border-[#444444] rounded-2xl p-3.5 sm:p-4 text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#383838] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 resize-none transition-all placeholder-slate-400 ${
-                    isMessageSent ? 'opacity-60 cursor-not-allowed bg-slate-100 dark:bg-[#2e2e2e]' : 'focus:bg-white dark:focus:bg-[#3d3d3d]'
-                  }`}
-                  placeholder="Scrie mesajul tău..."
-                />
-                
-                <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  <span>Caractere rămase: <strong>{3000 - messageText.length}</strong></span>
-                  
-                  <button className="inline-flex items-center gap-1 bg-slate-100 dark:bg-[#383838] hover:bg-slate-200 dark:hover:bg-[#444444] text-slate-700 dark:text-slate-200 font-medium px-3 py-1.5 rounded-xl border border-slate-200 dark:border-[#4a4a4a] transition-colors">
-                    <span className="text-sm">📎</span> Adaugă fișier <span className="text-slate-400">?</span>
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      disabled={isSendingMessage || isMessageSent}
+                      rows={3}
+                      maxLength={3000}
+                      className={`w-full border border-slate-200 dark:border-[#444444] rounded-2xl p-3.5 sm:p-4 text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-[#383838] text-sm focus:outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 resize-none transition-all placeholder-slate-400 ${
+                        isMessageSent ? 'opacity-60 cursor-not-allowed bg-slate-100 dark:bg-[#2e2e2e]' : 'focus:bg-white dark:focus:bg-[#3d3d3d]'
+                      }`}
+                      placeholder="Scrie mesajul tău..."
+                    />
+                    
+                    <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      <span>Caractere rămase: <strong>{3000 - messageText.length}</strong></span>
+                      
+                      <button className="inline-flex items-center gap-1 bg-slate-100 dark:bg-[#383838] hover:bg-slate-200 dark:hover:bg-[#444444] text-slate-700 dark:text-slate-200 font-medium px-3 py-1.5 rounded-xl border border-slate-200 dark:border-[#4a4a4a] transition-colors">
+                        <span className="text-sm">📎</span> Adaugă fișier <span className="text-slate-400">?</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Mesaj button */}
+                  <button 
+                    onClick={handleSendMessage}
+                    disabled={isSendingMessage || isMessageSent || !messageText.trim()}
+                    className={`w-full font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg mt-1 text-base ${
+                      isMessageSent
+                        ? 'bg-emerald-600 text-white cursor-default'
+                        : isSendingMessage
+                        ? 'bg-blue-600 text-white opacity-80 cursor-wait'
+                        : !messageText.trim()
+                        ? 'bg-slate-200 dark:bg-[#383838] text-slate-400 cursor-not-allowed shadow-none'
+                        : 'bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white shadow-blue-500/25'
+                    }`}
+                  >
+                    {isMessageSent ? (
+                      <>
+                        <CheckCircle2 size={18} />
+                        <span>Mesaj trimis cu succes!</span>
+                      </>
+                    ) : isSendingMessage ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" />
+                        <span>Se trimite...</span>
+                      </>
+                    ) : (
+                      <>
+                        <MessageCircle size={20} className="fill-current" />
+                        <span>Mesaj</span>
+                      </>
+                    )}
                   </button>
-                </div>
-              </div>
 
-              {/* Mesaj button */}
-              <button 
-                onClick={handleSendMessage}
-                disabled={isSendingMessage || isMessageSent || !messageText.trim()}
-                className={`w-full font-extrabold py-3.5 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg mt-1 text-base ${
-                  isMessageSent
-                    ? 'bg-emerald-600 text-white cursor-default'
-                    : isSendingMessage
-                    ? 'bg-blue-600 text-white opacity-80 cursor-wait'
-                    : !messageText.trim()
-                    ? 'bg-slate-200 dark:bg-[#383838] text-slate-400 cursor-not-allowed shadow-none'
-                    : 'bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white shadow-blue-500/25'
-                }`}
-              >
-                {isMessageSent ? (
-                  <>
-                    <CheckCircle2 size={18} />
-                    <span>Mesaj trimis cu succes!</span>
-                  </>
-                ) : isSendingMessage ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" />
-                    <span>Se trimite...</span>
-                  </>
-                ) : (
-                  <>
-                    <MessageCircle size={20} className="fill-current" />
-                    <span>Mesaj</span>
-                  </>
-                )}
-              </button>
+                  <hr className="border-slate-200 dark:border-[#333333] my-4" />
+                </>
+              ) : (
+                <div className="mb-2">
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="text-emerald-500" size={18} /> 
+                    Acesta este anunțul tău
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    Cumpărătorii vor folosi acest formular pentru a te contacta și a trimite oferte.
+                  </p>
+                  <hr className="border-slate-200 dark:border-[#333333] my-4 mt-5" />
+                </div>
+              )}
 
               <hr className="border-slate-200 dark:border-[#333333] my-1" />
 
@@ -1016,23 +1041,27 @@ export default function ListingDetailClient({
           </a>
 
           {/* Make Offer Button Mobile */}
-          <button
-            type="button"
-            onClick={() => setIsOfferModalOpen(true)}
-            className="flex-1 bg-[#03c1a2] hover:bg-[#02ab8f] active:scale-95 text-slate-950 font-black h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-[#03c1a2]/20 transition-all whitespace-nowrap cursor-pointer"
-          >
-            <Tag size={15} className="stroke-[2.5] flex-shrink-0" />
-            <span>Ofertă</span>
-          </button>
+          {!isOwner && (
+            <button
+              type="button"
+              onClick={() => setIsOfferModalOpen(true)}
+              className="flex-1 bg-[#03c1a2] hover:bg-[#02ab8f] active:scale-95 text-slate-950 font-black h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-[#03c1a2]/20 transition-all whitespace-nowrap cursor-pointer"
+            >
+              <Tag size={15} className="stroke-[2.5] flex-shrink-0" />
+              <span>Ofertă</span>
+            </button>
+          )}
 
           {/* Send Message Button */}
-          <Link
-            href={`/mesaje?listing=${listing.id}`}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-blue-600/25 transition-all whitespace-nowrap"
-          >
-            <MessageCircle size={15} className="flex-shrink-0" />
-            <span>Chat</span>
-          </Link>
+          {!isOwner && (
+            <Link
+              href={`/mesaje?listing=${listing.id}`}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold h-11 px-2.5 rounded-2xl flex items-center justify-center gap-1 text-xs sm:text-sm shadow-md shadow-blue-600/25 transition-all whitespace-nowrap"
+            >
+              <MessageCircle size={15} className="flex-shrink-0" />
+              <span>Chat</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -1113,13 +1142,15 @@ export default function ListingDetailClient({
               </div>
             </div>
 
-            <Link
-              href={`/mesaje?listing=${listing.id}`}
-              className="bg-[#00c9a7] hover:bg-[#00b395] active:scale-95 text-slate-950 font-bold px-6 py-2.5 rounded-full flex items-center gap-2 text-sm transition-all shadow-md flex-shrink-0 ml-3"
-            >
-              <MessageCircle size={18} className="fill-slate-950 stroke-none" />
-              <span>Chat</span>
-            </Link>
+            {!isOwner && (
+              <Link
+                href={`/mesaje?listing=${listing.id}`}
+                className="bg-[#00c9a7] hover:bg-[#00b395] active:scale-95 text-slate-950 font-bold px-6 py-2.5 rounded-full flex items-center gap-2 text-sm transition-all shadow-md flex-shrink-0 ml-3"
+              >
+                <MessageCircle size={18} className="fill-slate-950 stroke-none" />
+                <span>Chat</span>
+              </Link>
+            )}
           </div>
         </div>
       )}
