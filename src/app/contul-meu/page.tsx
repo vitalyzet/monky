@@ -1904,7 +1904,13 @@ export default function ContulMeuPage() {
               {/* Conversations List Preview */}
               <div className="divide-y divide-slate-100 dark:divide-slate-800/80 bg-white dark:bg-[#1a2332] rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
                 {getChatConversations()
-                  .filter((c) => c.buyerId === (currentUser?.uid || 'current-user-id') || c.sellerId === (currentUser?.uid || 'current-user-id'))
+                  .filter((c) => {
+                    const myUid = currentUser?.uid || 'current-user-id';
+                    const currentUserName = currentUser?.displayName || (typeof window !== 'undefined' ? localStorage.getItem('monky_user_name') : null) || 'Eu';
+                    const isByUid = c.buyerId === myUid || c.sellerId === myUid;
+                    const isByName = c.sellerName && currentUserName && c.sellerName.toLowerCase().trim() === currentUserName.toLowerCase().trim() && c.sellerId.startsWith('seller-');
+                    return isByUid || isByName;
+                  })
                   .map((conv) => (
                   <Link
                     key={conv.id}

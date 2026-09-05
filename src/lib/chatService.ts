@@ -455,11 +455,18 @@ export function getTotalUnreadChatCount(currentUserId?: string): number {
   
   // Default fallback if no user provided
   const uid = currentUserId || 'current-user-id';
+  const currentUserName = typeof window !== 'undefined' ? localStorage.getItem('monky_user_name') : null;
   
   return all.reduce((sum, conv) => {
+    const isSellerByName =
+      conv.sellerName &&
+      currentUserName &&
+      conv.sellerName.toLowerCase().trim() === currentUserName.toLowerCase().trim() &&
+      conv.sellerId.startsWith('seller-');
+
     if (conv.buyerId === uid) {
       return sum + (conv.unreadCountBuyer || 0);
-    } else if (conv.sellerId === uid) {
+    } else if (conv.sellerId === uid || isSellerByName) {
       return sum + (conv.unreadCountSeller || 0);
     }
     return sum;

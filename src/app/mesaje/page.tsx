@@ -64,7 +64,19 @@ function ChatContent() {
   // Load conversations and subscribe to updates
   const refreshConversations = () => {
     const list = getChatConversations();
-    const myChats = list.filter((c) => c.buyerId === currentUserId || c.sellerId === currentUserId);
+    const myChats = list.filter((c) => {
+      // 1. Direct UID match (Firebase users)
+      if (c.buyerId === currentUserId || c.sellerId === currentUserId) return true;
+
+      // 2. Name match fallback (for local listings or mock data that lack real UIDs)
+      const isSellerByName =
+        c.sellerName &&
+        currentUserName &&
+        c.sellerName.toLowerCase().trim() === currentUserName.toLowerCase().trim() &&
+        c.sellerId.startsWith('seller-');
+
+      return isSellerByName;
+    });
     setConversations(myChats);
     return myChats;
   };
@@ -173,12 +185,24 @@ function ChatContent() {
 
   // Filter conversations
   const filteredConversations = conversations.filter((c) => {
-    // Only show conversations where current user is a participant
-    const isParticipant = c.buyerId === currentUserId || c.sellerId === currentUserId;
-    if (!isParticipant) return false;
+    // Check if participant by UID or Name fallback
+    const isParticipantByUid = c.buyerId === currentUserId || c.sellerId === currentUserId;
+    const isSellerByName =
+      c.sellerName &&
+      currentUserName &&
+      c.sellerName.toLowerCase().trim() === currentUserName.toLowerCase().trim() &&
+      c.sellerId.startsWith('seller-');
 
+    if (!isParticipantByUid && !isSellerByName) return false;
+
+    // Buying tab: current user must be buyer
     if (activeTab === 'buying' && c.buyerId !== currentUserId) return false;
-    if (activeTab === 'selling' && c.sellerId !== currentUserId) return false;
+
+    // Selling tab: current user must be seller (by UID or by Name fallback)
+    if (activeTab === 'selling') {
+      const isSeller = c.sellerId === currentUserId || isSellerByName;
+      if (!isSeller) return false;
+    }
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
